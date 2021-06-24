@@ -11,5 +11,6 @@ void	*ft_free(char **str)
 		i++;
 	}
 	free(str);
+	str = NULL;
 	return (NULL);
 }

@@ -55,39 +55,41 @@ char	**ft_make_array(t_struct *env)
 	return (array);
 }
 
-int ft_exec(t_struct *env, char *str)
+void	ft_clean(t_struct *env)
+{
+	ft_free(env->dir);
+	ft_free(env->temporary);
+}
+
+int ft_parse_exec(t_struct *env, char *str)
 {
 	char	**path_arr;
 	char	*tmp;
-	char	*final;
-	pid_t	pid;
-	int	i;
-	char	**temporary;
-	char	**dir;
 	struct	stat buf[4096];
+
 	path_arr = ft_split(getenv("PATH"), ':');
-	dir = (char **)malloc(sizeof(char *) * ft_arraylen((path_arr) + 2));
-	temporary = ft_split(str, ' ');
-	i = 0;
-	while (path_arr[i])
+	env->dir = (char **)malloc(sizeof(char *) * ft_arraylen((path_arr) + 1));
+	env->temporary = ft_split(str, ' ');
+	env->i = 0;
+	while (path_arr[env->i])
 	{
-		tmp = ft_strjoin(path_arr[i], "/");
-		final = ft_strjoin1(tmp, temporary[0]);
-		dir[i] = ft_strdup(final);
-		free(final);
-		if (!stat(dir[i], buf))
+		tmp = ft_strjoin(path_arr[env->i], "/");
+		tmp = ft_strjoin1(tmp, env->temporary[0]);
+		env->dir[env->i] = ft_strdup(tmp);
+		free(tmp);
+		if (!stat(env->dir[env->i], buf))
 			break;
-		i++;
+		env->i++;
 	}
-	pid = fork();
-	if (pid == 0)
-		execve(dir[i], temporary, env->env_array);
-	wait(0);
+	//env->dir[env->i] = NULL;
 	return (1);
 }
 
-int	ft_pipe(int in, int out, char *str, t_struct *env)
+void	ft_pipe(int in, int out, t_struct *env)
 {
+	pid_t	pid;
+	int	status;
+
 	pid = fork();
 	if (pid == 0)
 	{
@@ -101,35 +103,47 @@ int	ft_pipe(int in, int out, char *str, t_struct *env)
 			dup2(out, 1);
 			close(out);
 		}
-		return (ft_exec(env, str));
+		execve(env->dir[env->i], env->temporary, env->env_array);
 	}
-	return (pid);
+	else
+	{
+		waitpid(pid, &status, 0);
+		// if (env->j > env->count)
+		// {
+
+		// 	env->count++;
+		// }
+		// execve(env->dir[env->i], env->temporary, env->env_array);
+	}
 }
 
 void	ft_parser(t_struct *env)
 {
-	int	i;
-	int	len;
-	int	in;
-	int	out;
+	int	len, in, out;
 	int	fd[2];
-	pid_t	pid;
 	char	**tmp;
 
-	i = 0;
+	env->j = 0;
 	in = 0;
+	out = fd[1];
+	env->count = 1;
 	env->env_array = ft_make_array(env);
 	tmp = ft_split_pipe(env->s_cmd_line, '|');
 	len = ft_arraylen(tmp);
-	while (i < len - 1)
+	pipe(fd);
+	while (env->j < len)
 	{
-		opipe(fd);
-		ft_pipe(in, fd[1],tmp[i], env);
+		ft_parse_exec(env, tmp[env->j]);
+		ft_pipe(in, fd[1], env);
+		out = fd[1];
 		close(fd[1]);
 		in = fd[0];
-		i++;
+		env->j++;
 	}
+	close(fd[0]);
 	if (in != 0)
 		dup2(in, 0);
-	ft_pipe(in, fd[1],tmp[i], env);
+	out = STDOUT_FILENO;
+	if (len < 2)
+		ft_pipe(in, out, env);
 }

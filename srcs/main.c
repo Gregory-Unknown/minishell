@@ -59,8 +59,8 @@ int	main(int argc, char **argv, char **envv)
 		env->s_cmd_line = readline("minishell $>> ");
 		if (ft_strlen(env->s_cmd_line) != 0)
 			add_history(env->s_cmd_line);
-			ft_quotes(env);
-			ft_parser(env);
+		ft_quotes(env);
+		ft_parser(env);
 			//ft_builtins(env);
 	}
 	return (0);

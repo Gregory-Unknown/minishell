@@ -26,6 +26,11 @@ typedef struct s_struct
 	t_list	*s_exp;
 	char	**env_array;
 	char	*s_cmd_line;
+	char	**dir;
+	char	**temporary;
+	int	i;
+	int	j;
+	int	count;
 }t_struct;
 
 t_list	*ft_init_env(char **envv);
