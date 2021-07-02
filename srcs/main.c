@@ -51,8 +51,11 @@ int	main(int argc, char **argv, char **envv)
 	(void)argc;
 	(void)argv;
 	env = (t_struct *)malloc(sizeof(t_struct));
-	env->s_env = 0;
-	env->s_exp = 0;
+	// env->s_env = (t_list *)malloc(sizeof(t_list));
+	// env->s_exp = (t_list *)malloc(sizeof(t_list));
+	// env->s_env = 0;
+	// env->s_exp = 0;
+	// env->s_pid = 0;
 	env->s_env = ft_init_env(envv);
 	while (1)
 	{

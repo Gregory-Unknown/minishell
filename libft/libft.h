@@ -3,6 +3,15 @@
 # include <stdlib.h>
 # include <unistd.h>
 
+typedef struct s_list1
+{
+	char	*command;
+	int	pipe;
+	pid_t	pid;
+	struct s_list1	*next;
+	struct s_list1	*prev;
+}t_list1;
+
 typedef struct s_list
 {
 	char			*content;
@@ -10,6 +19,8 @@ typedef struct s_list
 	struct s_list	*next;
 }t_list;
 
+t_list1	*ft_new_list(char *command, int is_pipe);
+void	ft_push_back(t_list1 **lst, t_list1 *new);
 void	ft_lstadd_back(t_list **lst, t_list *new);
 void	ft_lstadd_front(t_list **lst, t_list *new);
 void	ft_lstclear(t_list **lst, void (*del)(void *));

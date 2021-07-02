@@ -19,11 +19,21 @@
 //     struct s_list   *next;
 // }                   t_list;
 
+// typedef struct s_fds
+// {
+	// int	in;
+	// int	out;
+// 	int	fd[2];
+// 	int	number;
+// 	t_fds	next;
+// }t_fds;
+
 
 typedef struct s_struct
 {
 	t_list	*s_env;
 	t_list	*s_exp;
+	t_list1	*s_com;
 	char	**env_array;
 	char	*s_cmd_line;
 	char	**dir;
@@ -31,6 +41,9 @@ typedef struct s_struct
 	int	i;
 	int	j;
 	int	count;
+	int	len;
+	int	pipe_prev[2];
+	int	pipe_next[2];
 }t_struct;
 
 t_list	*ft_init_env(char **envv);
