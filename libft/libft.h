@@ -6,6 +6,9 @@
 typedef struct s_list1
 {
 	char	*command;
+	char	*redcom;
+	char	**redirect_command;
+	int	redirect;
 	int	pipe;
 	pid_t	pid;
 	struct s_list1	*next;
@@ -42,5 +45,7 @@ void	*ft_free(char **str);
 void	ft_bzero(char *s, int n);
 char	*ft_strjoin(char *s1, char *s2);
 char	*ft_strjoin1(char *s1, char *s2);
+void	ft_list_clear(t_list1 *list, void (*del)(void *));
+void	ft_clear_all_list(t_list1 **lst, void (*del)(void *));
 
 #endif

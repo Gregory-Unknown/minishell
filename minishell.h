@@ -8,7 +8,9 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/stat.h>
-#include <sys/wait.h>
+# include <sys/wait.h>
+# include <fcntl.h>
+//# include <signal.h>
 
 //char        **g_env;
 
@@ -42,8 +44,6 @@ typedef struct s_struct
 	int	j;
 	int	count;
 	int	len;
-	int	pipe_prev[2];
-	int	pipe_next[2];
 }t_struct;
 
 t_list	*ft_init_env(char **envv);

@@ -1,5 +1,39 @@
 #include "../minishell.h"
 
+void	ft_signal_handler(int signal)
+{
+	if (signal == SIGINT)
+	{
+		if (waitpid(-1, NULL, WNOHANG) == -1)
+		{
+			rl_on_new_line();
+			rl_redisplay();
+			printf("  \n");
+			rl_on_new_line();
+			rl_replace_line("", 0);
+			rl_redisplay();
+		}
+		else
+			printf("\n");
+	}
+}
+
+void	ft_signal_quit_handler(int signal)
+{
+	if (signal == SIGQUIT)
+	{
+		if (waitpid(-1, NULL, WNOHANG) == -1)
+		{
+			rl_on_new_line();
+			rl_redisplay();
+			printf("  \b\b");
+		}
+		else
+			printf("Quit: 3\n");
+	}
+}
+
+
 void	ft_builtins(t_struct *env)
 {
 	if (ft_strcmp(env->s_cmd_line, "env") == 0)
@@ -56,15 +90,20 @@ int	main(int argc, char **argv, char **envv)
 	// env->s_env = 0;
 	// env->s_exp = 0;
 	// env->s_pid = 0;
+	signal(SIGINT, ft_signal_handler);
+	signal(SIGQUIT, ft_signal_quit_handler);
 	env->s_env = ft_init_env(envv);
 	while (1)
 	{
 		env->s_cmd_line = readline("minishell $>> ");
-		if (ft_strlen(env->s_cmd_line) != 0)
+		if (ft_strlen(env->s_cmd_line) > 0)
+		{
 			add_history(env->s_cmd_line);
-		ft_quotes(env);
-		ft_parser(env);
-			//ft_builtins(env);
+			ft_quotes(env);
+			ft_builtins(env);
+			ft_parser(env);
+
+		}
 	}
 	return (0);
 }

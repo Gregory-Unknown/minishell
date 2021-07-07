@@ -1,4 +1,5 @@
 #include "libft.h"
+#include <stdio.h>
 
 void	ft_push_back(t_list1 **lst, t_list1 *new)
 {

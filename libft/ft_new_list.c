@@ -7,6 +7,8 @@ t_list1	*ft_new_list(char *command, int pipe)
 	list = (t_list1 *)malloc(sizeof(t_list1));
 	list->command = command;
 	list->pipe = pipe;
+	list->redcom = 0;
+	list->redirect_command = 0;
 	list->pid = 0;
 	list->next = 0;
 	list->prev = 0;
