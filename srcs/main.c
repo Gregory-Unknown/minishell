@@ -65,7 +65,7 @@ void	ft_builtins(t_struct *env, int (*fd))
 	if (ft_strcmp(env->temporary[0], "cd") == 0)
 		ft_cd(env);
 	if (ft_strcmp(env->temporary[0], "pwd") == 0)
-		ft_pwd();
+		ft_pwd(fd);
 	if (ft_strcmp(env->temporary[0], "exit") == 0)
 		return ;
 }
