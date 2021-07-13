@@ -15,7 +15,7 @@ t_list	*ft_init_env(char **envv)
 	return (head);
 }
 
-void	ft_print_env(t_struct *env)
+void	ft_print_env(t_struct *env, int (*fd))
 {
 	t_list	*tmp;
 
@@ -23,7 +23,10 @@ void	ft_print_env(t_struct *env)
 	while (tmp)
 	{
 		if (tmp->flag)
-			printf("%s\n", tmp->content);
+		{
+			write(fd[1], tmp->content, ft_strlen(tmp->content));
+			write(fd[1], "\n", 1);
+		}
 		tmp = tmp->next;
 	}
 }

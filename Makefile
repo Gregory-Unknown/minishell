@@ -1,6 +1,7 @@
 NAME		= minishell
 
-SRC			= main.c export.c env.c unset.c parser.c
+SRC			= main.c ft_export.c ft_env.c ft_unset.c ft_parser.c \
+			ft_echo.c ft_cd.c ft_pwd.c ft_exit.c
 SRCS		= $(addprefix srcs/, $(SRC))
 
 OBJS		= $(SRCS:.c=.o)

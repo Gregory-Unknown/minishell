@@ -42,12 +42,15 @@ void	ft_del_elem(t_struct *env, int len, char *str)
 void	ft_unset(t_struct *env)
 {
 	char	**tmp;
-	int		len;
+	int	len;
+	int	i;
 
+	i = 1;
 	len = 0;
-	tmp = ft_split(env->s_cmd_line, ' ');
-	if (tmp[1])
+	tmp = env->temporary;
+	while (tmp[i])
 	{
-		ft_del_elem(env, len, tmp[1]);
+		ft_del_elem(env, len, tmp[i]);
+		i++;
 	}
 }

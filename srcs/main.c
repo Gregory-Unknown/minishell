@@ -33,15 +33,41 @@ void	ft_signal_quit_handler(int signal)
 	}
 }
 
-
-void	ft_builtins(t_struct *env)
+int	ft_check_builtins(char *str)
 {
-	if (ft_strcmp(env->s_cmd_line, "env") == 0)
-		ft_print_env(env);
-	if (ft_strncmp(env->s_cmd_line, "export", 6) == 0)
-		ft_export(env);
-	if (ft_strncmp(env->s_cmd_line, "unset", 5) == 0)
+	if (ft_strcmp(str, "env") == 0)
+		return (1);
+	else if (ft_strcmp(str, "export") == 0)
+		return (1);
+	else if (ft_strcmp(str, "unset") == 0)
+		return (1);
+	else if (ft_strcmp(str, "echo") == 0)
+		return (1);
+	else if (ft_strcmp(str, "cd") == 0)
+		return (1);
+	else if (ft_strcmp(str, "pwd") == 0)
+		return (1);
+	else if (ft_strcmp(str, "exit") == 0)
+		return (1);
+	return (0);
+}
+
+void	ft_builtins(t_struct *env, int (*fd))
+{
+	if (ft_strcmp(env->temporary[0], "env") == 0)
+		ft_print_env(env, fd);
+	if (ft_strcmp(env->temporary[0], "export") == 0)
+		ft_export(env, fd);
+	if (ft_strcmp(env->temporary[0], "unset") == 0)
 		ft_unset(env);
+	if (ft_strcmp(env->temporary[0], "echo") == 0)
+		ft_echo(env, fd);
+	if (ft_strcmp(env->temporary[0], "cd") == 0)
+		ft_cd(env);
+	if (ft_strcmp(env->temporary[0], "pwd") == 0)
+		ft_pwd();
+	if (ft_strcmp(env->temporary[0], "exit") == 0)
+		return ;
 }
 
 int	ft_check_double_quotes(char *str, int i)
@@ -85,24 +111,28 @@ int	main(int argc, char **argv, char **envv)
 	(void)argc;
 	(void)argv;
 	env = (t_struct *)malloc(sizeof(t_struct));
-	// env->s_env = (t_list *)malloc(sizeof(t_list));
-	// env->s_exp = (t_list *)malloc(sizeof(t_list));
-	// env->s_env = 0;
-	// env->s_exp = 0;
-	// env->s_pid = 0;
 	signal(SIGINT, ft_signal_handler);
 	signal(SIGQUIT, ft_signal_quit_handler);
 	env->s_env = ft_init_env(envv);
+	env->s_exp = 0;
 	while (1)
 	{
 		env->s_cmd_line = readline("minishell $>> ");
+		add_history(env->s_cmd_line);
+		if (env->s_cmd_line == NULL)
+        {
+            printf("\033[Aminishell >> $ exit\n");
+            exit(0);
+        }
+        if (ft_strcmp(env->s_cmd_line, "exit") == 0)
+        {
+            printf("exit\n");
+            break ;
+        }
 		if (ft_strlen(env->s_cmd_line) > 0)
 		{
-			add_history(env->s_cmd_line);
-			ft_quotes(env);
-			ft_builtins(env);
+			//ft_quotes(env);
 			ft_parser(env);
-
 		}
 	}
 	return (0);

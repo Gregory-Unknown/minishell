@@ -30,6 +30,7 @@
 // 	t_fds	next;
 // }t_fds;
 
+int	g_status;
 
 typedef struct s_struct
 {
@@ -44,12 +45,18 @@ typedef struct s_struct
 	int	j;
 	int	count;
 	int	len;
+	int	flag_builtins;
 }t_struct;
 
 t_list	*ft_init_env(char **envv);
-void	ft_print_env(t_struct *env);
-void	ft_export(t_struct *env);
+void	ft_print_env(t_struct *env, int (*fd));
+void	ft_export(t_struct *env, int (*fd));
 void	ft_unset(t_struct *env);
 void	ft_parser(t_struct *env);
+int		ft_check_builtins(char *str);
+void	ft_builtins(t_struct *env, int (*fd));
+int		ft_echo(t_struct *env, int (*fd));
+void	ft_pwd();
+int		ft_cd(t_struct *env);
 
 #endif

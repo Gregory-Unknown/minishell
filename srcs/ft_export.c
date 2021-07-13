@@ -19,8 +19,7 @@ void	ft_copy_env(t_struct *env)
 	tmp = env->s_env;
 	while (tmp)
 	{
-		ft_lstadd_back(&env->s_exp,
-			ft_lstnew(ft_strdup(tmp->content), tmp->flag));
+		ft_lstadd_back(&env->s_exp, ft_lstnew(ft_strdup(tmp->content), tmp->flag));
 		tmp = tmp->next;
 	}
 }
@@ -45,21 +44,21 @@ void	ft_sort_exp(t_struct *env)
 	}
 }
 
-void	ft_print_exp(t_struct *env)
+void	ft_print_exp(t_struct *env, int (*fd))
 {
 	t_list	*tmp;
 
-	if (env->s_exp == 0)
-	{
-		ft_copy_env(env);
-		ft_sort_exp(env);
-	}
+	ft_copy_env(env);
+	ft_sort_exp(env);
 	tmp = env->s_exp;
 	while (tmp)
 	{
-		printf("declare -x %s\n", tmp->content);
+		write(fd[1], "declare -x ", 11);
+		write(fd[1], tmp->content, ft_strlen(tmp->content));
+		write(fd[1], "\n", 1);
 		tmp = tmp->next;
 	}
+	ft_lstclear(&(env->s_exp), free);
 }
 
 int	ft_check_first_letter(char c)
@@ -86,12 +85,13 @@ int	ft_check_name(char *str)
 		i = 1;
 		while (str[i])
 		{
-			if (ft_check_sym(str[i]))
+			if (!ft_check_sym(str[i]))
 				return (1);
 			i++;
 		}
+		return (0);
 	}
-	return (0);
+	return (1);
 }
 
 void	ft_add_elem(t_struct *env, int len, char *str)
@@ -100,34 +100,34 @@ void	ft_add_elem(t_struct *env, int len, char *str)
 		len = 1;
 	else
 		len = 0;
-	ft_lstadd_back(&env->s_env, ft_lstnew(ft_strdup(str), len));
-	ft_lstclear(&env->s_exp, free);
-	env->s_exp = 0;
+	ft_lstadd_back(&(env)->s_env, ft_lstnew(ft_strdup(str), len));
+	ft_lstclear(&(env->s_exp), free);
 }
 
 void	ft_add_env(t_struct *env)
 {
 	char	**tmp;
-	char	**tmp2;
-	int		len;
+	int	len;
+	int	i;
 
-	tmp = ft_split(env->s_cmd_line, ' ');
-	tmp2 = ft_split(tmp[1], '=');
-	len = ft_arraylen(tmp2);
-	if (ft_check_name(tmp2[0]) && len < 3)
-		ft_add_elem(env, len, tmp[1]);
+	i = 1;
+	while (env->temporary[i])
+	{
+		tmp = ft_split(env->temporary[i], '=');
+		len = ft_arraylen(tmp);
+		if (!ft_check_name(tmp[0]) && len < 3)
+			ft_add_elem(env, len, env->temporary[i]);
+		i++;
+	}
 }
 
-void	ft_export(t_struct *env)
+void	ft_export(t_struct *env, int (*fd))
 {
-	char	**tmp;
 	int		len;
 
-	tmp = ft_split(env->s_cmd_line, ' ');
-	len = ft_arraylen(tmp);
-	tmp = ft_free(tmp);
-	if (len == 1)
-		ft_print_exp(env);
-	else
+	len = ft_arraylen(env->temporary);
+	if (len > 1)
 		ft_add_env(env);
+	else if (len == 1)
+		ft_print_exp(env, fd);
 }
