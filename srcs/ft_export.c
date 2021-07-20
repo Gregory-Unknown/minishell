@@ -44,7 +44,7 @@ void	ft_sort_exp(t_struct *env)
 	}
 }
 
-void	ft_print_exp(t_struct *env, int (*fd))
+void	ft_print_exp(t_struct *env, t_list1 *fd)
 {
 	t_list	*tmp;
 
@@ -53,9 +53,9 @@ void	ft_print_exp(t_struct *env, int (*fd))
 	tmp = env->s_exp;
 	while (tmp)
 	{
-		write(fd[1], "declare -x ", 11);
-		write(fd[1], tmp->content, ft_strlen(tmp->content));
-		write(fd[1], "\n", 1);
+		write(fd->fd[1], "declare -x ", 11);
+		write(fd->fd[1], tmp->content, ft_strlen(tmp->content));
+		write(fd->fd[1], "\n", 1);
 		tmp = tmp->next;
 	}
 	ft_lstclear(&(env->s_exp), free);
@@ -104,30 +104,31 @@ void	ft_add_elem(t_struct *env, int len, char *str)
 	ft_lstclear(&(env->s_exp), free);
 }
 
-void	ft_add_env(t_struct *env)
+void	ft_add_env(t_struct *env, t_list1 *fd)
 {
 	char	**tmp;
 	int	len;
 	int	i;
 
 	i = 1;
-	while (env->temporary[i])
+	while (fd->temporary[i])
 	{
-		tmp = ft_split(env->temporary[i], '=');
+		tmp = ft_split(fd->temporary[i], '=');
 		len = ft_arraylen(tmp);
+		//printf("ASD %s\n", fd->temporary[i]);
 		if (!ft_check_name(tmp[0]) && len < 3)
-			ft_add_elem(env, len, env->temporary[i]);
+			ft_add_elem(env, len, fd->temporary[i]);
 		i++;
 	}
 }
 
-void	ft_export(t_struct *env, int (*fd))
+void	ft_export(t_struct *env, t_list1 *fd)
 {
 	int		len;
 
-	len = ft_arraylen(env->temporary);
+	len = ft_arraylen(fd->temporary);
 	if (len > 1)
-		ft_add_env(env);
+		ft_add_env(env, fd);
 	else if (len == 1)
 		ft_print_exp(env, fd);
 }

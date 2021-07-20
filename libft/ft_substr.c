@@ -9,11 +9,11 @@ char	*ft_substr(char *s, int start, int len)
 	if (!s)
 		return (0);
 	count = ft_strlen(s);
-	str = (char*)malloc(sizeof(char) * (len + 1));
+	str = (char *)malloc(sizeof(char) * (len + 1));
 	if (!str)
-		return (NULL);
+		exit(-1);
 	tmp = str;
-	while (s[start] && (start < count) && len--)
+	while (s[start] && start < len)
 		*str++ = s[start++];
 	*str = '\0';
 	return (tmp);

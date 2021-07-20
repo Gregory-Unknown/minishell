@@ -1,514 +1,254 @@
 #include "../minishell.h"
 
-
-// int fd[2];
-
-char	*ft_space(char *str)
+void	ft_check_error()
 {
-	char	*tmp;
-	int	i;
-	int	j;
-	int	len;
-	int	flag;
+	// if (g_status == 127)
 
-	if (!str)
-		return (NULL);
-	i = 0;
-	flag = 0;
-	len = ft_strlen(str);
-	if (str[i] == 32)
-	{
-		while (str[i] && str[i] == 32)
-			i++;
-		flag = 1;
-	}
-	j = len - 1;
-	if (str[j] == 32)
-	{
-		while (str[j] && str[j] == 32)
-			j--;
-		flag = 2;
-	}
-	if (!flag)
-		return (str);
-	tmp = ft_strdup(str);
-	free(str);
-	str = (char *)malloc(sizeof(char) * (j - i + 2));
-	if (!str)
-		return (NULL);
-	len = j;
-	j = 0;
-	while (i <= len)
-	{
-		str[j] = tmp[i];
-		j++;
-		i++;
-	}
-	str[j] = '\0';
-	free(tmp);
-	return (str);
-}
-
-char	**ft_make_array(t_struct *env)
-{
-	char	**array;
-	t_list	*tmp;
-	int	i;
-
-	tmp = env->s_env;
-	i = ft_lstsize(tmp) + 1;
-	array = (char **)malloc(sizeof(char *) * i);
-	if (!array)
-		return (NULL);
-	i = 0;
-	while (tmp)
-	{
-		array[i] = ft_strdup(tmp->content);
-		i++;
-		tmp = tmp->next;
-	}
-	array[i] = NULL;
-	return (array);
+	// if (g_status == 126)
 }
 
 void	ft_clean(t_struct *env)
 {
-	if (env->dir)
-		ft_free(env->dir);
-	if (env->temporary)
-		ft_free(env->temporary);
-		//ft_free(env->env_array);
-	// if (env->s_exp)
-	// 	ft_lstclear(&(env->s_exp), free);
 	ft_clear_all_list(&(env->s_com), free);
 }
 
 t_list1	*ft_make_list(t_struct *env)
 {
-	int i;
-	int pipe;
+	int	i;
+	int	len;
 	char	**tmp;
 	t_list1	*head;
 
+	env->s_com = 0;
+	head = env->s_com;
 	tmp = ft_split_pipe(env->s_cmd_line, '|');
 	i = 0;
-	while (tmp[i])
+	len = ft_arraylen(tmp) - 1;
+	while (i < len)
 	{
-		tmp[i] = ft_space(tmp[i]);
+		ft_push_back(&head, (ft_new_list(ft_space(ft_strdup(tmp[i])), 1)));
+		env->count_pipe++;
 		i++;
 	}
-	env->len = ft_arraylen(tmp);
-	pipe = 0;
-	if (env->len > 1)
-		pipe = 1;
-	i = 0;
-	while (tmp[i])
-	{
-		if (tmp[i + 1] == 0)
-			pipe = 0;
-		ft_push_back(&head, ft_new_list(tmp[i], pipe));
-		i++;
-	}
+	ft_push_back(&head, ft_new_list(ft_space(ft_strdup(tmp[i])), 0));
 	return (head);
 }
+
+int	ft_find_redirection(char *str)
+{
+	int	i;
+	int flag;
+
+	i = 0;
+	flag = 0;
+	while (str[i])
+	{
+		flag++;
+		if (ft_strncmp(&str[i], ">>", 2) == 0)
+			return (i);
+		else if (ft_strncmp(&str[i], ">", 1) == 0)
+			return (i);
+		else if (ft_strncmp(&str[i], "<<", 2) == 0)
+			return (i);
+		else if (ft_strncmp(&str[i], "<", 1) == 0)
+			return (i);
+		else
+			flag--;
+		i++;
+	}
+	if (flag)
+		return (0);
+	return (-1);
+}
+
+void	ft_redirect_check_out(t_list1 *tmp)
+{
+	int	i;
+	char	*str;
+
+	str = 0;
+	i = ft_find_redirection(tmp->command);
+	if (i > 0)
+	{
+		str = ft_strdup(tmp->command);
+		free(tmp->command);
+		tmp->command = 0;
+		tmp->command = ft_substr(str, 0, i);
+		tmp->redcom = ft_strdup(&str[i]);
+		free(str);
+	}
+	else if (i == 0)
+	{
+		tmp->redcom = ft_strdup(tmp->command);
+		free(tmp->command);
+		tmp->command = 0;
+	}
+}
+
 
 int	ft_is_redirect(char *s)
 {
 	if (ft_strncmp(s, ">>", 2) == 0)
-		return (1);
+		return (2);
 	else if (ft_strncmp(s, ">", 1) == 0)
 		return (1);
 	else if (ft_strncmp(s, "<<", 2) == 0)
-		return (1);
+		return (2);
 	else if (ft_strncmp(s, "<", 1) == 0)
 		return (1);
 	return (0);
 }
 
-int	ft_check_redirect(char *s)
+int	ft_check_end(char *str, int i)
 {
-	int	i;
-
-	i = 0;
-	while (s[i])
-	{
-		if (ft_is_redirect(&s[i]))
-			return (1);
+	i++;
+	while (str[i] && ft_is_redirect(&str[i]) == 0)
 		i++;
-	}
-	return (0);
+	return (i);
 }
 
-int	ft_find_count(char *s, t_list1 *tmp)
+void	ft_redirect_split_out(t_list1 *tmp)
 {
 	int	i;
-	int	flag;
-	int	count;
+	int	j;
+	int	num;
+	char	*temp;
+	char	*str;
 
 	i = 0;
-	flag = 0;
-	count = 0;
-	while (s[i] && ft_is_redirect(&s[i]) == 0)
+	str = ft_strdup("");
+	while (tmp->redcom[i])
 	{
-		if (flag == 0 && s[i] != 34 && s[i] != 39 && s[i] != 32 && s[i])
+		num = ft_is_redirect(&(tmp->redcom)[i]);
+		if (num)
 		{
-			flag = 1;
-			count++;
+			if (num == 1)
+				j = ft_check_end(tmp->redcom, i);
+			else if (num == 2)
+				j = ft_check_end(tmp->redcom, i + 1);
+			temp = ft_strjoin("/", ft_substr(tmp->redcom, i, j));
+			str = ft_strjoin1(str, temp);
+			free(temp);
 		}
-		if (s[i] && flag && s[i] == 34)
-		{
-			i++;
-			count++;
-			while (s[i] && s[i] != 34)
-				i++;
-		}
-		if (s[i] && flag && s[i] == 39)
-		{
-			i++;
-			count++;
-			while (s[i] && s[i] != 39)
-				i++;
-		}
-		if (s[i] == 32 && flag == 1)
-			flag = 0;
 		i++;
 	}
-	if (s[i])
-		tmp->redcom = ft_strdup(&s[i]);
-	return (count);
+	tmp->redirect_command = ft_split(str, '/');
+	free(str);
 }
 
-void	ft_redirect(t_struct *env, t_list1 *tmp)
+void	ft_get_path_param(t_list1 *tmp)
 {
-	int	i;
-	int	count;
-	char **s;
+	struct	stat buf[4096];
+	char	*path;
 
-	count = ft_find_count(tmp->command, tmp);
-	if (!count)
-		env->temporary = NULL;
-	if (ft_check_redirect(tmp->command))
+	if (!stat(&tmp->temporary[0][2], buf))
+		g_status = 127;
+	else
 	{
-		i = 0;
-		env->temporary = (char **)malloc(sizeof(char *) * (count + 1));
-		s = ft_split_pipe(tmp->command, ' ');
-		while (s[i] && ft_is_redirect(s[i]) == 0)
-		{
-			env->temporary[i] = ft_strdup(s[i]);
-			i++;
-		}
-		env->temporary[i] = NULL;
-		if (ft_is_redirect(s[i]) && !(s[i + 1]))
-		{
-			printf("minishell: syntax error near unexpected token `newline'\n");
-			//ft_clean(env);
-			//free(tmp->redcom);
-			tmp->redirect = -1;
-			return ;
-		}
+		path = getcwd(0, 0);
+		tmp->temporary[0] = ft_strjoin1(path, &tmp->temporary[0][2]);
+		tmp->dir = ft_malloc_array(2);
+		tmp->i = 0;
+		tmp->dir[tmp->i] = ft_strdup(tmp->temporary[0]);
+		tmp->i = 1;
+		tmp->dir[tmp->i] = 0;
+	}
+}
+
+void	ft_check_valid_path(t_list1 *tmp)
+{
+	struct	stat buf[4096];
+
+	if (!stat(tmp->temporary[0], buf))
+	{
+		tmp->dir = ft_malloc_array(2);
+		tmp->dir[0] = ft_strdup(tmp->temporary[0]);
+		tmp->dir[1] = 0;
 	}
 	else
-		env->temporary = ft_split_pipe(tmp->command, ' ');
+		g_status = 127;
 }
 
-int	ft_parse_exec(t_struct *env, t_list1 *tmp)
+void	ft_find_path(t_list1 *tmp, char **path_arr)
 {
-	char	**path_arr;
 	char	*s;
 	struct	stat buf[4096];
 
-	ft_redirect(env, tmp);
-	if (tmp->redirect == -1)
-		return (0);
-	env->flag_builtins = 0;
-	if (ft_check_builtins(env->temporary[0]))
+	while (path_arr[tmp->i] && !g_status)
 	{
-		env->flag_builtins = 1;
-		return (0);
-	}
-	path_arr = ft_split(getenv("PATH"), ':');
-	env->dir = (char **)malloc(sizeof(char *) * (ft_arraylen(path_arr) + 2));
-	if (!env->dir)
-		return (0);
-	env->i = 0;
-	while (env->temporary[0] && path_arr[env->i])
-	{
-		s = ft_strjoin(path_arr[env->i], "/");
-		if (!s)
-			return (0);
-		s = ft_strjoin1(s, env->temporary[0]);
-		if (!s)
-			return (0);
-		env->dir[env->i] = ft_strdup(s);
-		if (!env->dir[env->i])
-			return (0);
+		s = ft_strjoin(path_arr[tmp->i], "/");
+		s = ft_strjoin1(s, tmp->temporary[0]);
+		tmp->dir[tmp->i] = ft_strdup(s);
 		free(s);
-		if (!stat(env->dir[env->i], buf))
+		if (!stat(tmp->dir[tmp->i], buf))
 		{
-			env->dir[env->i + 1] = NULL;
+			tmp->dir[tmp->i + 1] = NULL;
 			break;
 		}
-			env->i++;
+			tmp->i++;
 	}
-	if (env->dir[env->i + 1] != NULL)
-		env->dir[env->i] = NULL;
-	if (env->i == ft_arraylen(path_arr))
-		printf("minishell: %s: command not found\n", env->temporary[0]);
-	return (1);
+	if (tmp->dir[tmp->i + 1] != NULL)
+		tmp->dir[tmp->i] = NULL;
 }
 
-void	ft_process_redirect(t_list1 *tmp)
+void	ft_get_path_command(t_list1	*tmp)
 {
-	int fd[2];
-	int	i;
+	char	**path_arr;
 
-	tmp->redirect_command = ft_split_pipe(tmp->redcom, ' ');
-	i = 0;
-	while (tmp->redirect_command[i])
-	{
-		if (ft_strcmp(tmp->redirect_command[i], ">>") == 0)
-		{
-			i++;
-			if (tmp->redirect_command[i])
-				fd[1] = open(tmp->redirect_command[i], O_CREAT | O_WRONLY | O_APPEND, S_IRWXU);
-			else
-				printf("minishell: syntax error near unexpected token `newline'\n");
-			if (fd[1] < 0)
-				exit(1);
-			dup2(fd[1], 1);
-			close(fd[1]);
-		}
-		else if (ft_strcmp(tmp->redirect_command[i], ">") == 0)
-		{
-			i++;
-			if (tmp->redirect_command[i])
-				fd[1] = open(tmp->redirect_command[i], O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU);
-			else
-			{
-				printf("minishell: syntax error near unexpected token `newline'\n");
-			}
-			if (fd[1] < 0)
-				exit(1);
-			dup2(fd[1], 1);
-			close(fd[1]);
-		}
-		else if (ft_strcmp(tmp->redirect_command[i], "<<") == 0)
-		{
-				char	*line;
-
-				i++;
-				if (tmp->redirect_command[i])
-				{
-					while (ft_strcmp((line = readline("> ")), tmp->redirect_command[i]))
-						;
-				}
-				else
-					printf("bash: syntax error near unexpected token `newline'\n");
-				close(fd[1]);
-				dup2(fd[0], 0);
-				close(fd[0]);
-		}
-		else if (ft_strcmp(tmp->redirect_command[i], "<") == 0)
-		{
-			i++;
-			fd[0] = open(tmp->redirect_command[i], O_RDONLY);
-			if (fd[0] < 0)
-				printf("minishell: %s: No such file or directory\n", tmp->redirect_command[i]);
-			dup2(fd[0], 0);
-			close(fd[0]);
-			close(fd[1]);
-		}
-		i++;
-	}
-}
-
-void	ft_process_redirect_builtins(t_list1 *tmp, int (*fd))
-{
-	int	i;
-
-	if (tmp->redcom)
-		tmp->redirect_command = ft_split_pipe(tmp->redcom, ' ');
-	i = 0;
-	while (tmp->redirect_command[i])
-	{
-		if (ft_strcmp(tmp->redirect_command[i], ">>") == 0)
-		{
-			i++;
-			if (tmp->redirect_command[i])
-				fd[1] = open(tmp->redirect_command[i], O_CREAT | O_WRONLY | O_APPEND, S_IRWXU);
-			else
-				printf("minishell: syntax error near unexpected token `newline'\n");
-			if (fd[1] < 0)
-				exit(1);
-			// dup2(fd[1], 1);
-			//close(fd[1]);
-		}
-		else if (ft_strcmp(tmp->redirect_command[i], ">") == 0)
-		{
-			i++;
-			if (tmp->redirect_command[i])
-				fd[1] = open(tmp->redirect_command[i], O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU);
-			else
-				printf("minishell: syntax error near unexpected token `newline'\n");
-			// if (fd[1] < 0)
-			// 	exit(1);
-			// dup2(fd[1], 1);
-			// close(fd[1]);
-		}
-		// else if (ft_strcmp(tmp->redirect_command[i], "<<") == 0)
-		// {
-		// 		char	*line;
-
-		// 		i++;
-		// 		if (tmp->redirect_command[i])
-		// 		{
-		// 			while (ft_strcmp((line = readline("> ")), tmp->redirect_command[i]))
-		// 				;
-		// 		}
-		// 		else
-		// 			printf("bash: syntax error near unexpected token `newline'\n");
-		// 		close(fd[1]);
-		// 		dup2(fd[0], 0);
-		// 		close(fd[0]);
-		// }
-		// else if (ft_strcmp(tmp->redirect_command[i], "<") == 0)
-		// {
-		// 	i++;
-		// 	fd[0] = open(tmp->redirect_command[i], O_RDONLY);
-		// 	if (fd[0] < 0)
-		// 		printf("minishell: %s: No such file or directory\n", tmp->redirect_command[i]);
-		// 	dup2(fd[0], 0);
-		// 	close(fd[0]);
-		// 	close(fd[1]);
-		// }
-		i++;
-	}
-}
-
-void	ft_exec_pipe(t_struct *env, t_list1 *tmp, int (*fd))
-{
-	pid_t	pid;
-
-	pid = 0;
-	if (env->flag_builtins)
-	{
-		if (tmp->redcom)
-			ft_process_redirect_builtins(tmp, fd);
-		ft_builtins(env, fd);
-	}
-	else if (!env->flag_builtins)
-	{
-		pid = fork();
-		if (!pid)
-		{
-			if (env->temporary)
-			{
-				if (tmp->redcom)
-					ft_process_redirect(tmp);
-				env->env_array = ft_make_array(env);
-				execve(env->dir[env->i], env->temporary, env->env_array);
-				exit(-1);
-			}
-		}
-		else
-		{
-			waitpid(pid, NULL, 0);
-		}
-	}
-}
-
-void	ft_exec(t_struct *env, t_list1 *tmp)
-{
-	pid_t	pid;
-	int fd[2];
-
-	pid = 0;
-	if (env->flag_builtins)
-	{
-		fd[0] = 0;
-		fd[1] = 1;
-		if (tmp->redcom)
-			ft_process_redirect_builtins(tmp, fd);
-		ft_builtins(env, fd);
-	}
-	else
-	{
-		pid = fork();
-		if (!pid)
-		{
-			if (env->temporary)
-			{
-				if (tmp->redcom)
-					ft_process_redirect(tmp);
-				env->env_array = ft_make_array(env);
-				execve(env->dir[env->i], env->temporary, env->env_array);
-				exit(-1);
-			}
-		}
-		else
-			waitpid(pid, NULL, 0);
-	}
-}
-
-void	ft_pipe(t_struct *env, t_list1 *tmp)
-{
-	int fd[2];
-
-	pipe(fd);
-	tmp->pid = fork();
-	if (tmp->pid == -1)
-	{
+	path_arr = ft_split(getenv("PATH"), ':');
+	if (!path_arr)
 		exit(-1);
-	}
-	else if (tmp->pid == 0)
-	{
-		dup2(fd[1], 1);
-		close(fd[0]);
-		ft_exec_pipe(env, tmp, fd);
-		close(fd[1]);
-		exit(1);
-	}
+	tmp->dir = ft_malloc_array(ft_arraylen(path_arr) + 2);
+	tmp->i = 0;
+	ft_find_path(tmp, path_arr);
+	if (tmp->i > ft_arraylen(path_arr))
+		g_status = 127;
+}
+
+void	ft_command_check_out(t_list1 *tmp)
+{
+	tmp->temporary = ft_split_pipe(tmp->command, ' ');
+	if (!tmp->temporary)
+		exit(-1);
+	if (ft_strcmp(tmp->temporary[0], "./") == 0)
+		ft_get_path_param(tmp);
+	else if (tmp->temporary[0][0] == '/')
+		ft_check_valid_path(tmp);
+	else if(ft_check_buildins(tmp->temporary[0]))
+		tmp->builtins = 1;
 	else
+		ft_get_path_command(tmp);
+}
+
+void	ft_make_list_redirect(t_struct *env)
+{
+	int	i;
+	t_list1	*tmp;
+
+	i = 0;
+	tmp = env->s_com;
+	while (tmp && !g_status)
 	{
-		dup2(fd[0], 0);
-		close(fd[0]);
-		close(fd[1]);
+		ft_redirect_check_out(tmp);
+		if (tmp->redcom)
+			ft_redirect_split_out(tmp);
+		if (tmp->command)
+			ft_command_check_out(tmp);
+		if (tmp->redcom)
+			ft_process_redirect(tmp);
+		tmp = tmp->next;
 	}
+}
+
+void	ft_init_param(t_struct *env)
+{
+	env->s_com = ft_make_list(env);
+	ft_make_list_redirect(env);
 }
 
 void	ft_parser(t_struct *env)
 {
-	t_list1 *tmp;
-	int	fds;
-
-	env->dir = 0;
-	env->temporary = 0;
-	env->s_com = ft_make_list(env);
-	tmp = env->s_com;
-	tmp->redcom = 0;
-	fds = dup(0);
-	while (tmp->pipe)
-	{
-		ft_parse_exec(env, tmp);
-		if (tmp->redirect == -1)
-		{
-			dup2(fds, 0);
-			ft_clean(env);
-			return ;
-		}
-		ft_pipe(env, tmp);
-		tmp = tmp->next;
-	}
-	ft_parse_exec(env, tmp);
-	if (tmp->redirect == -1)
-	{
-		dup2(fds, 0);
-		ft_clean(env);
-		return ;
-	}
-	ft_exec(env, tmp);
-	dup2(fds, 0);
-	while (wait(NULL) > 0)
-		;
-	ft_clean(env);
+	ft_init_param(env);
+	ft_pipe_start(env);
+	ft_check_error();
 }

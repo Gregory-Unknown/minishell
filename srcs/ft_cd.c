@@ -30,22 +30,22 @@ void	ft_update_pwd(t_struct *env)
 	}
 }
 
-int	ft_cd(t_struct *env)
+int	ft_cd(t_struct *env, t_list1 *fd)
 {
 	char *str;
 
-	if (env->temporary[1] == 0)
+	if (fd->temporary[1] == 0)
 	{
 		chdir(getenv("HOME"));
 		ft_update_pwd(env);
 		return (1);
 	}
 	str = getcwd(0, 0);
-	if (env->temporary[1][0] == '~')
+	if (fd->temporary[1][0] == '~')
 	{
-		if (env->temporary[1][1] == '/')
-			env->temporary[1] = ft_strjoin(getenv("HOME"), &env->temporary[1][1]);
-		else if (env->temporary[1][1] == 0)
+		if (fd->temporary[1][1] == '/')
+			fd->temporary[1] = ft_strjoin(getenv("HOME"), &fd->temporary[1][1]);
+		else if (fd->temporary[1][1] == 0)
 		{
 			chdir(getenv("HOME"));
 			free(str);
@@ -53,7 +53,7 @@ int	ft_cd(t_struct *env)
 			return (1);
 		}
 	}
-	if (chdir(env->temporary[1]) == -1)
+	if (chdir(fd->temporary[1]) == -1)
 	{
 		chdir(str);
 		free(str);

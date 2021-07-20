@@ -8,9 +8,17 @@ typedef struct s_list1
 	char	*command;
 	char	*redcom;
 	char	**redirect_command;
-	int	redirect;
+	char	**dir;
+	char	**temporary;
+	int	i;
+	int	builtins;
+	int	dr;
+	int	sr;
+	int	dl;
+	int	sl;
 	int	pipe;
 	pid_t	pid;
+	int	fd[2];
 	struct s_list1	*next;
 	struct s_list1	*prev;
 }t_list1;
@@ -47,5 +55,8 @@ char	*ft_strjoin(char *s1, char *s2);
 char	*ft_strjoin1(char *s1, char *s2);
 void	ft_list_clear(t_list1 *list, void (*del)(void *));
 void	ft_clear_all_list(t_list1 **lst, void (*del)(void *));
+int		ft_isspace(char c);
+char	*ft_space(char *str);
+char	**ft_malloc_array(int len);
 
 #endif
