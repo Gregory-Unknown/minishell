@@ -51,6 +51,7 @@ static int	ft_len(char *s, char c)
 		if (*s && *s == 34)
 		{
 			s++;
+			len++;
 			while (*s && *s != 34)
 			{
 				len++;
@@ -60,6 +61,7 @@ static int	ft_len(char *s, char c)
 		else if (*s && *s == 39)
 		{
 			s++;
+			len++;
 			while (*s && *s != 39)
 			{
 				len++;
@@ -103,21 +105,21 @@ char			**ft_split_pipe(char *s, char c)
 			j = 0;
 			while (*s && *s != c)
 			{
-				if (*s == 34)
+				if (*s == '\"')
 				{
-					s++;
-					while (*s != 34 && *s)
+					str[i][j++] = *s++;
+					while (*s != '\"' && *s)
 						str[i][j++] = *s++;
-					if (*s == 34)
-						s++;
+					if (*s == '\"')
+						str[i][j++] = *s++;
 				}
-				else if (*s == 39)
+				else if (*s == '\'')
 				{
-					s++;
-					while (*s != 39 && *s)
+					str[i][j++] = *s++;
+					while (*s != '\'' && *s)
 						str[i][j++] = *s++;
-					if (*s == 39)
-						s++;
+					if (*s == '\'')
+						str[i][j++] = *s++;
 				}
 				else
 					str[i][j++] = *s++;

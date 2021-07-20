@@ -3,7 +3,7 @@ NAME		= minishell
 SRC			= main.c ft_export.c ft_env.c ft_unset.c ft_parser.c \
 			ft_echo.c ft_cd.c ft_pwd.c ft_exit.c ft_pipe.c ft_exec.c \
 			ft_redirect.c ft_redirect_utils.c ft_parser_utils.c ft_lexer.c \
-			ft_buildins.c
+			ft_buildins.c ft_shlvl.c
 
 
 SRCS		= $(addprefix srcs/, $(SRC))

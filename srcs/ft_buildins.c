@@ -1,5 +1,46 @@
 #include "../minishell.h"
 
+char	*ft_split_command(char *str, char c)
+{
+	char **s;
+	int	i;
+
+	i = 0;
+	s = ft_split(str, c);
+	free(str);
+	str = ft_strdup(s[0]);
+	i = 1;
+	while (s[i])
+	{
+		str = ft_strjoin1(str, s[i]);
+		i++;
+	}
+	return (str);
+}
+
+char	*ft_name_check(char *str)
+{
+	if (!ft_strchr(str, '\"') && !ft_strchr(str, '\''))
+		return (str);
+	if (ft_strchr(str, '\"'))
+		return(ft_split_command(str, '\"'));
+	else if (ft_strchr(str, '\''))
+		return(ft_split_command(str, '\''));
+	return (str);
+}
+
+void	ft_name_quotes(t_list1 *tmp)
+{
+	int	i;
+
+	i = 0;
+	while (tmp->temporary[i])
+	{
+		tmp->temporary[i] = ft_name_check(tmp->temporary[i]);
+		i++;
+	}
+}
+
 int	ft_check_buildins(char *str)
 {
 	if (ft_strcmp(str, "env") == 0)

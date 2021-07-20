@@ -89,6 +89,7 @@ int	main(int argc, char **argv, char **envv)
 		if (env->s_cmd_line == NULL)
 		{
 			printf("\033[Aminishell >> $ exit\n");
+			ft_shell_lvl(env);
 			exit(0);
 		}
 		if (ft_strlen(env->s_cmd_line) > 0)

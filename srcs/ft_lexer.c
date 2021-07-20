@@ -16,7 +16,7 @@ int	ft_check_pipe(char * str, char c)
 	return (0);
 }
 
-int	ft_check_quotes(char * str, char c)
+int	ft_check_quotes(char *str, char c)
 {
 	int	i;
 	int	flag;
@@ -27,7 +27,7 @@ int	ft_check_quotes(char * str, char c)
 	{
 		if (!flag && str[i] == c)
 			flag = 1;
-		if (flag && str[i] == c)
+		else if (flag && str[i] == c)
 			flag = 0;
 		i++;
 	}

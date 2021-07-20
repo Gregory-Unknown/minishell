@@ -2,6 +2,7 @@
 # define LIBFT_H
 # include <stdlib.h>
 # include <unistd.h>
+# include <limits.h>
 
 typedef struct s_list1
 {
@@ -58,5 +59,8 @@ void	ft_clear_all_list(t_list1 **lst, void (*del)(void *));
 int		ft_isspace(char c);
 char	*ft_space(char *str);
 char	**ft_malloc_array(int len);
+int		ft_strchr(char *str, char c);
+char	*ft_itoa(int n);
+int		ft_atoi(const char *str);
 
 #endif

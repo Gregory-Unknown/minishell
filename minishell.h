@@ -30,6 +30,7 @@ void	ft_print_env(t_struct *env, t_list1 *fd);
 void	ft_export(t_struct *env, t_list1 *fd);
 void	ft_unset(t_struct *env, t_list1 *fd);
 void	ft_parser(t_struct *env);
+void	ft_name_quotes(t_list1 *tmp);
 int		ft_check_buildins(char *str);
 void	ft_buildins_one(t_struct *env, t_list1 *fd);
 void	ft_buildins(t_struct *env, t_list1 *fd);
@@ -49,5 +50,6 @@ void	ft_pipe_start(t_struct *env);
 char	**ft_make_array(t_struct *env);
 int		ft_lexer(t_struct *env);
 void	ft_clean(t_struct *env);
+void	ft_shell_lvl(t_struct *env);
 
 #endif

@@ -34,15 +34,32 @@ t_list1	*ft_make_list(t_struct *env)
 	return (head);
 }
 
+void	ft_pass_quote(int *i, char *str)
+{
+	if (str[*i] && str[*i] == '\'')
+	{
+		(*i)++;
+		while (str[*i] && str[*i] != '\'')
+			(*i)++;
+	}
+	if (str[*i] && str[*i] == '\"')
+	{
+		(*i)++;
+		while (str[*i] && str[*i] != '\"')
+			(*i)++;
+	}
+}
+
 int	ft_find_redirection(char *str)
 {
 	int	i;
-	int flag;
+	int	flag;
 
 	i = 0;
 	flag = 0;
 	while (str[i])
 	{
+		ft_pass_quote(&i, str);
 		flag++;
 		if (ft_strncmp(&str[i], ">>", 2) == 0)
 			return (i);
@@ -138,21 +155,12 @@ void	ft_redirect_split_out(t_list1 *tmp)
 
 void	ft_get_path_param(t_list1 *tmp)
 {
-	struct	stat buf[4096];
-	char	*path;
-
-	if (!stat(&tmp->temporary[0][2], buf))
-		g_status = 127;
-	else
-	{
-		path = getcwd(0, 0);
-		tmp->temporary[0] = ft_strjoin1(path, &tmp->temporary[0][2]);
-		tmp->dir = ft_malloc_array(2);
-		tmp->i = 0;
-		tmp->dir[tmp->i] = ft_strdup(tmp->temporary[0]);
-		tmp->i = 1;
-		tmp->dir[tmp->i] = 0;
-	}
+	tmp->dir = ft_malloc_array(2);
+	tmp->i = 0;
+	tmp->dir[tmp->i] = ft_strdup(tmp->temporary[0]);
+	tmp->i = 1;
+	tmp->dir[tmp->i] = 0;
+	tmp->i = 0;
 }
 
 void	ft_check_valid_path(t_list1 *tmp)
@@ -208,9 +216,10 @@ void	ft_get_path_command(t_list1	*tmp)
 void	ft_command_check_out(t_list1 *tmp)
 {
 	tmp->temporary = ft_split_pipe(tmp->command, ' ');
+	ft_name_quotes(tmp);
 	if (!tmp->temporary)
 		exit(-1);
-	if (ft_strcmp(tmp->temporary[0], "./") == 0)
+	if (ft_strncmp(tmp->temporary[0], "./", 2) == 0)
 		ft_get_path_param(tmp);
 	else if (tmp->temporary[0][0] == '/')
 		ft_check_valid_path(tmp);
@@ -234,6 +243,8 @@ void	ft_make_list_redirect(t_struct *env)
 			ft_redirect_split_out(tmp);
 		if (tmp->command)
 			ft_command_check_out(tmp);
+		if (ft_strcmp(tmp->temporary[0], "./minishell") == 0)
+			ft_shell_lvl(env);
 		if (tmp->redcom)
 			ft_process_redirect(tmp);
 		tmp = tmp->next;

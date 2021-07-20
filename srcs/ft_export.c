@@ -12,6 +12,36 @@ void	ft_swap_list(char **s1, char **s2)
 	free(tmp);
 }
 
+char	*ft_str_export(char	*str)
+{
+	char	*s;
+	int	i;
+	int	j;
+	int	len;
+
+	len = ft_strlen(str) + 3;
+	s = (char *)malloc(sizeof(char) * len);
+	len = 0;
+	i = 0;
+	j = 0;
+	while (str[j])
+	{
+		if (j > 0 && str[j - 1] == '=')
+		{
+			s[i] = '\"';
+			i++;
+		}
+		s[i] = str[j];
+		i++;
+		j++;
+	}
+	s[i] = '\"';
+	i++;
+	s[i] = '\0';
+	free(str);
+	return (s);
+}
+
 void	ft_copy_env(t_struct *env)
 {
 	t_list	*tmp;
@@ -19,7 +49,7 @@ void	ft_copy_env(t_struct *env)
 	tmp = env->s_env;
 	while (tmp)
 	{
-		ft_lstadd_back(&env->s_exp, ft_lstnew(ft_strdup(tmp->content), tmp->flag));
+		ft_lstadd_back(&env->s_exp, ft_lstnew(ft_str_export(ft_strdup(tmp->content)), tmp->flag));
 		tmp = tmp->next;
 	}
 }
