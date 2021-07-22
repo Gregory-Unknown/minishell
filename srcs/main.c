@@ -79,8 +79,12 @@ int	main(int argc, char **argv, char **envv)
 	signal(SIGQUIT, ft_signal_quit_handler);
 	env->s_env = ft_init_env(envv);
 	env->s_exp = 0;
+	g_status = 0;
 	while (1)
 	{
+		if (g_status != 0)
+			printf("FUCK OFF ERROR !\n");
+		env->status = g_status;
 		g_status = 0;
 		env->count_pipe = 0;
 		env->s_cmd_line = readline("minishell $>> ");
@@ -95,7 +99,6 @@ int	main(int argc, char **argv, char **envv)
 		if (ft_strlen(env->s_cmd_line) > 0)
 		{
 			ft_lexer(env);
-			//ft_quotes(env);
 			if (!g_status)
 				ft_parser(env);
 			else

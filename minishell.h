@@ -23,6 +23,7 @@ typedef struct s_struct
 	char	**env_array;
 	char	*s_cmd_line;
 	int	count_pipe;
+	int	status;
 }t_struct;
 
 t_list	*ft_init_env(char **envv);
@@ -30,9 +31,10 @@ void	ft_print_env(t_struct *env, t_list1 *fd);
 void	ft_export(t_struct *env, t_list1 *fd);
 void	ft_unset(t_struct *env, t_list1 *fd);
 void	ft_parser(t_struct *env);
-void	ft_name_quotes(t_list1 *tmp);
+void	ft_name_quotes1(t_list1 *tmp);
+void	ft_name_quotes2(t_list1 *tmp);
 int		ft_check_buildins(char *str);
-void	ft_buildins_one(t_struct *env, t_list1 *fd);
+void	ft_buildins_one(t_struct *env, t_list1 *fd, int	*flag);
 void	ft_buildins(t_struct *env, t_list1 *fd);
 int		ft_echo(t_list1 *fd);
 void	ft_pwd();
@@ -51,5 +53,8 @@ char	**ft_make_array(t_struct *env);
 int		ft_lexer(t_struct *env);
 void	ft_clean(t_struct *env);
 void	ft_shell_lvl(t_struct *env);
+void	ft_signal_handler(int signal);
+void	ft_signal_quit_handler(int signal);
+void	ft_check_dollar(t_list1 *tmp, t_struct *env);
 
 #endif

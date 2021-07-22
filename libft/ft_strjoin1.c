@@ -17,6 +17,11 @@ char	*ft_strjoin1(char *s1, char *s2)
 	}
 	free(s1);
 	j = 0;
+	if (!s2)
+	{
+		str[i] = '\0';
+		return (str);
+	}
 	while (s2[j])
 		str[i++] = s2[j++];
 	str[i] = '\0';

@@ -17,7 +17,6 @@ void	ft_double_right(char *str, t_list1 *tmp)
 		return ;
 	}
 	tmp->dr = 1;
-	//close(tmp->fd[1]);
 }
 
 void	ft_single_right(char *str, t_list1 *tmp)
@@ -37,7 +36,6 @@ void	ft_single_right(char *str, t_list1 *tmp)
 		return ;
 	}
 	tmp->sr = 1;
-	//close(tmp->fd[1]);
 }
 
 void	ft_double_left(char *str, t_list1 *tmp)

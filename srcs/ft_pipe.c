@@ -64,6 +64,7 @@ void	ft_pipe_start(t_struct *env)
 
 	tmp = env->s_com;
 	fd0 = dup(0);
+
 	while (tmp->pipe && !g_status)
 	{
 		ft_pipe(env, tmp);

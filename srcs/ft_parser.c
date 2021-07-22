@@ -209,17 +209,19 @@ void	ft_get_path_command(t_list1	*tmp)
 	tmp->dir = ft_malloc_array(ft_arraylen(path_arr) + 2);
 	tmp->i = 0;
 	ft_find_path(tmp, path_arr);
-	if (tmp->i > ft_arraylen(path_arr))
+	if (tmp->i >= ft_arraylen(path_arr))
 		g_status = 127;
 }
 
-void	ft_command_check_out(t_list1 *tmp)
+void	ft_command_check_out(t_list1 *tmp, t_struct *env)
 {
 	tmp->temporary = ft_split_pipe(tmp->command, ' ');
-	ft_name_quotes(tmp);
-	if (!tmp->temporary)
-		exit(-1);
-	if (ft_strncmp(tmp->temporary[0], "./", 2) == 0)
+	ft_name_quotes1(tmp);
+	ft_check_dollar(tmp, env);
+	ft_name_quotes2(tmp);
+	if (tmp->temporary && !ft_strcmp(tmp->temporary[0], "./minishell") && !tmp->temporary[1] && !g_status)
+		ft_shell_lvl(env);
+	else if (ft_strncmp(tmp->temporary[0], "./", 2) == 0)
 		ft_get_path_param(tmp);
 	else if (tmp->temporary[0][0] == '/')
 		ft_check_valid_path(tmp);
@@ -239,14 +241,13 @@ void	ft_make_list_redirect(t_struct *env)
 	while (tmp && !g_status)
 	{
 		ft_redirect_check_out(tmp);
-		if (tmp->redcom)
+		if (tmp->redcom && !g_status)
 			ft_redirect_split_out(tmp);
-		if (tmp->command)
-			ft_command_check_out(tmp);
-		if (ft_strcmp(tmp->temporary[0], "./minishell") == 0)
-			ft_shell_lvl(env);
-		if (tmp->redcom)
+		if (tmp->command && !g_status)
+			ft_command_check_out(tmp, env);
+		if (tmp->redcom && !g_status)
 			ft_process_redirect(tmp);
+
 		tmp = tmp->next;
 	}
 }
@@ -260,6 +261,7 @@ void	ft_init_param(t_struct *env)
 void	ft_parser(t_struct *env)
 {
 	ft_init_param(env);
-	ft_pipe_start(env);
+	if (!g_status)
+		ft_pipe_start(env);
 	ft_check_error();
 }

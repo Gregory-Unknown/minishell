@@ -32,29 +32,32 @@ static void	ft_check_fd(t_list1 *tmp)
 
 void	ft_exec(t_struct *env, t_list1 *tmp)
 {
+	int	flag;
 	pid_t	pid;
 
 	pid = 0;
+	flag = 1;
 	if (!env->count_pipe && tmp->builtins)
-		ft_buildins_one(env, tmp);
-	pid = fork();
-	if (!pid)
+		ft_buildins_one(env, tmp, &flag);
+	if (flag)
 	{
-		if (tmp->builtins)
-			ft_buildins(env, tmp);
-		else
+		pid = fork();
+		if (!pid)
 		{
-			ft_check_fd(tmp);
-			if (tmp->temporary)
+			if (tmp->builtins)
+				ft_buildins(env, tmp);
+			else
 			{
-				//if (tmp->redcom)
-				// 	ft_process_redirect(tmp);
-				env->env_array = ft_make_array(env);
-				execve(tmp->dir[tmp->i], tmp->temporary, env->env_array);
+				ft_check_fd(tmp);
+				if (tmp->temporary && !g_status)
+				{
+					env->env_array = ft_make_array(env);
+					g_status = execve(tmp->dir[tmp->i], tmp->temporary, env->env_array);
+				}
 			}
+			exit(1);
 		}
-		exit(1);
+		else
+			waitpid(pid, NULL, 0);
 	}
-	else
-		waitpid(pid, NULL, 0);
 }

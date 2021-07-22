@@ -145,7 +145,6 @@ void	ft_add_env(t_struct *env, t_list1 *fd)
 	{
 		tmp = ft_split(fd->temporary[i], '=');
 		len = ft_arraylen(tmp);
-		//printf("ASD %s\n", fd->temporary[i]);
 		if (!ft_check_name(tmp[0]) && len < 3)
 			ft_add_elem(env, len, fd->temporary[i]);
 		i++;
