@@ -17,6 +17,7 @@ void	ft_double_right(char *str, t_list1 *tmp)
 		return ;
 	}
 	tmp->dr = 1;
+	free(str);
 }
 
 void	ft_single_right(char *str, t_list1 *tmp)
@@ -36,6 +37,7 @@ void	ft_single_right(char *str, t_list1 *tmp)
 		return ;
 	}
 	tmp->sr = 1;
+	free(str);
 }
 
 void	ft_double_left(char *str, t_list1 *tmp)
@@ -52,7 +54,9 @@ void	ft_double_left(char *str, t_list1 *tmp)
 		{
 			write(fds, line, ft_strlen(line));
 			write(fds, "\n", 1);
+			free(line);
 		}
+		free(line);
 		close(fds);
 	}
 	else
@@ -60,7 +64,9 @@ void	ft_double_left(char *str, t_list1 *tmp)
 	tmp->fd[0] = open(".tmp", O_RDONLY);
 	if (tmp->fd[0] < 0)
 		printf("minishell: %s: No such file or directory\n", str);
+	unlink(".tmp");
 	tmp->dl = 1;
+	free(str);
 }
 
 void	ft_single_left(char *str, t_list1 *tmp)
@@ -74,4 +80,5 @@ void	ft_single_left(char *str, t_list1 *tmp)
 	else
 		printf("bash: syntax error near unexpected token `newline'4\n");
 	tmp->sl = 1;
+	free(str);
 }

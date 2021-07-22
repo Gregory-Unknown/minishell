@@ -1,13 +1,11 @@
 #include "../minishell.h"
 
-void	ft_pwd(int (*fd))
+void	ft_pwd(t_list1 *fd)
 {
 	char	cwd[1024];
 	if (getcwd(cwd, sizeof(cwd)) != NULL)
 	{
-		write(fd[1], cwd, ft_strlen(cwd));
-		write(fd[1], "\n", 1);
+		write(fd->fd[1], cwd, ft_strlen(cwd));
+		write(fd->fd[1], "\n", 1);
 	}
-	// else
-	// 	perror("getcwd() error");
 }

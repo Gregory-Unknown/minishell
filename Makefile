@@ -14,8 +14,8 @@ CC			= gcc
 
 INC			= -I ./ -I ./libft
 
-FLAGS		= -Wall -Wextra -Werror -fsanitize=address  -g
-#
+FLAGS		= -Wall -Wextra -Werror  -g
+# -fsanitize=address
 
 READLFLAG	= -L/Users/esobchak/.brew/Cellar/readline/8.1/lib/ \
 			-I/Users/esobchak/.brew/Cellar/readline/8.1/include \

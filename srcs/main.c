@@ -79,6 +79,10 @@ int	main(int argc, char **argv, char **envv)
 	signal(SIGQUIT, ft_signal_quit_handler);
 	env->s_env = ft_init_env(envv);
 	env->s_exp = 0;
+	env->s_com = 0;
+	env->env_array = 0;
+	env->stroka = 0;
+	env->s_cmd_line = 0;
 	g_status = 0;
 	while (1)
 	{
@@ -88,22 +92,23 @@ int	main(int argc, char **argv, char **envv)
 		g_status = 0;
 		env->count_pipe = 0;
 		env->s_cmd_line = readline("minishell $>> ");
-		env->s_cmd_line = ft_space(env->s_cmd_line);
-		add_history(env->s_cmd_line);
 		if (env->s_cmd_line == NULL)
 		{
 			printf("\033[Aminishell >> $ exit\n");
-			ft_shell_lvl(env);
 			exit(0);
 		}
+		add_history(env->s_cmd_line);
 		if (ft_strlen(env->s_cmd_line) > 0)
 		{
+			env->stroka = env->s_cmd_line;
+			env->s_cmd_line = ft_space(env->s_cmd_line);
+			free(env->stroka);
 			ft_lexer(env);
 			if (!g_status)
 				ft_parser(env);
-			else
-				printf("FUCK ERROR !\n");
 		}
+		free(env->s_cmd_line);
+		sleep(3);
 	}
 	return (0);
 }

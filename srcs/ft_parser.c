@@ -9,7 +9,21 @@ void	ft_check_error()
 
 void	ft_clean(t_struct *env)
 {
-	ft_clear_all_list(&(env->s_com), free);
+	(void) env;
+	if (env->s_com != 0)
+		ft_clear_all_list(&(env->s_com), free);
+	if (env->s_exp)
+		ft_lstclear(&env->s_exp, free);
+	if (env->env_array)
+	{
+		ft_free(env->env_array);
+		env->env_array = 0;
+	}
+	if (env->s_cmd_line)
+	{
+		free(env->s_cmd_line);
+		env->s_cmd_line = 0;
+	}
 }
 
 t_list1	*ft_make_list(t_struct *env)
@@ -24,13 +38,21 @@ t_list1	*ft_make_list(t_struct *env)
 	tmp = ft_split_pipe(env->s_cmd_line, '|');
 	i = 0;
 	len = ft_arraylen(tmp) - 1;
+	env->stroka = 0;
 	while (i < len)
 	{
-		ft_push_back(&head, (ft_new_list(ft_space(ft_strdup(tmp[i])), 1)));
+		env->stroka = ft_strdup(tmp[i]);
+		ft_push_back(&head, ft_new_list(ft_space(env->stroka), 1));
+		free(env->stroka);
+		env->stroka = 0;
 		env->count_pipe++;
 		i++;
 	}
-	ft_push_back(&head, ft_new_list(ft_space(ft_strdup(tmp[i])), 0));
+	env->stroka = ft_strdup(tmp[i]);
+	ft_push_back(&head, ft_new_list(ft_space(env->stroka), 0));
+	free(env->stroka);
+	ft_free(tmp);
+	env->stroka = 0;
 	return (head);
 }
 
@@ -84,7 +106,9 @@ void	ft_redirect_check_out(t_list1 *tmp)
 	char	*str;
 
 	str = 0;
-	i = ft_find_redirection(tmp->command);
+	i = 0;
+	if (tmp->command)
+		i = ft_find_redirection(tmp->command);
 	if (i > 0)
 	{
 		str = ft_strdup(tmp->command);
@@ -131,6 +155,7 @@ void	ft_redirect_split_out(t_list1 *tmp)
 	int	num;
 	char	*temp;
 	char	*str;
+	char	*stroka;
 
 	i = 0;
 	str = ft_strdup("");
@@ -143,9 +168,11 @@ void	ft_redirect_split_out(t_list1 *tmp)
 				j = ft_check_end(tmp->redcom, i);
 			else if (num == 2)
 				j = ft_check_end(tmp->redcom, i + 1);
-			temp = ft_strjoin("/", ft_substr(tmp->redcom, i, j));
+			stroka =  ft_substr(tmp->redcom, i, j);
+			temp = ft_strjoin("/", stroka);
 			str = ft_strjoin1(str, temp);
 			free(temp);
+			free(stroka);
 		}
 		i++;
 	}
@@ -195,7 +222,12 @@ void	ft_find_path(t_list1 *tmp, char **path_arr)
 		}
 			tmp->i++;
 	}
-	if (tmp->dir[tmp->i + 1] != NULL)
+	if (tmp->i >= ft_arraylen(path_arr))
+	{
+		tmp->dir[tmp->i] = NULL;
+		g_status = 127;
+	}
+	if (!g_status && tmp->dir[tmp->i + 1] != NULL)
 		tmp->dir[tmp->i] = NULL;
 }
 
@@ -209,8 +241,7 @@ void	ft_get_path_command(t_list1	*tmp)
 	tmp->dir = ft_malloc_array(ft_arraylen(path_arr) + 2);
 	tmp->i = 0;
 	ft_find_path(tmp, path_arr);
-	if (tmp->i >= ft_arraylen(path_arr))
-		g_status = 127;
+	ft_free(path_arr);
 }
 
 void	ft_command_check_out(t_list1 *tmp, t_struct *env)
@@ -247,7 +278,6 @@ void	ft_make_list_redirect(t_struct *env)
 			ft_command_check_out(tmp, env);
 		if (tmp->redcom && !g_status)
 			ft_process_redirect(tmp);
-
 		tmp = tmp->next;
 	}
 }
@@ -255,13 +285,15 @@ void	ft_make_list_redirect(t_struct *env)
 void	ft_init_param(t_struct *env)
 {
 	env->s_com = ft_make_list(env);
-	ft_make_list_redirect(env);
+	if (!g_status)
+		ft_make_list_redirect(env);
 }
 
 void	ft_parser(t_struct *env)
 {
-	ft_init_param(env);
+	if (!g_status)
+		ft_init_param(env);
 	if (!g_status)
 		ft_pipe_start(env);
-	ft_check_error();
+	ft_clean(env);
 }

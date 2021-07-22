@@ -76,23 +76,23 @@ int	ft_lexer(t_struct *env)
 {
 	char *str;
 
-	str = ft_strdup(env->s_cmd_line);
-	if (ft_check_pipe(str, '|'))
+	str = env->s_cmd_line;
+	if (ft_check_pipe(env->s_cmd_line, '|'))
 	{
 		g_status = 258;
 		return (1);
 	}
-	if (ft_check_quotes(str, '\'') || ft_check_quotes(str, '\"'))
+	if (ft_check_quotes(env->s_cmd_line, '\'') || ft_check_quotes(env->s_cmd_line, '\"'))
 	{
 		g_status = 127;
 		return (1);
 	}
-	if (ft_check_redirect(str, '>') || ft_check_redirect(str, '<'))
+	if (ft_check_redirect(env->s_cmd_line, '>') || ft_check_redirect(env->s_cmd_line, '<'))
 	{
 		g_status = 258;
 		return (1);
 	}
-	if (ft_check_symbol(str, '\\') || ft_check_symbol(str, ';'))
+	if (ft_check_symbol(env->s_cmd_line, '\\') || ft_check_symbol(env->s_cmd_line, ';'))
 	{
 		g_status = 258;
 		return (1);

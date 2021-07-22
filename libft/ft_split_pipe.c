@@ -2,11 +2,13 @@
 
 static int	ft_word_count(char *s, char c)
 {
-	int count;
-	int flag;
+	int	count;
+	int	flag;
+	int	quote_flag;
 
 	count = 0;
 	flag = 0;
+	quote_flag = 0;
 	while (*s)
 	{
 		if (flag == 0 && *s != 34 && *s != 39 && *s != c && *s)
@@ -14,27 +16,15 @@ static int	ft_word_count(char *s, char c)
 			flag = 1;
 			count++;
 		}
-		if (*s && flag && *s == 34)
-		{
-			s++;
-			count++;
-			while (*s && *s != 34)
-			{
-				count++;
-				s++;
-			}
-		}
-		if (*s && flag && *s == 39)
-		{
-			s++;
-			count++;
-			while (*s && *s != 39)
-			{
-				count++;
-				s++;
-			}
-		}
-		if (*s == c && flag == 1)
+		if (*s == 34 && !quote_flag)
+			quote_flag = 1;
+		else if (*s == 34 && quote_flag)
+			quote_flag = 0;
+		if (*s == 39 && !quote_flag)
+			quote_flag = 1;
+		else if (*s == 39 && quote_flag)
+			quote_flag = 0;
+		if (*s == c && !quote_flag && flag == 1)
 			flag = 0;
 		s++;
 	}
@@ -43,33 +33,22 @@ static int	ft_word_count(char *s, char c)
 
 static int	ft_len(char *s, char c)
 {
-	int len;
+	int	len;
+	int	flag;
 
 	len = 0;
-	while (*s && *s != c)
+	flag = 0;
+	while (*s && (*s != c || flag))
 	{
-		if (*s && *s == 34)
-		{
-			s++;
-			len++;
-			while (*s && *s != 34)
-			{
-				len++;
-				s++;
-			}
-		}
-		else if (*s && *s == 39)
-		{
-			s++;
-			len++;
-			while (*s && *s != 39)
-			{
-				len++;
-				s++;
-			}
-		}
-		else
-			len++;
+		if (*s == 34 && !flag)
+			flag = 1;
+		else if (*s == 34 && flag)
+			flag = 0;
+		if (*s == 39 && !flag)
+			flag = 1;
+		else if (*s == 39 && flag)
+			flag = 0;
+		len++;
 		s++;
 	}
 	return (len);
@@ -124,7 +103,8 @@ char			**ft_split_pipe(char *s, char c)
 				else
 					str[i][j++] = *s++;
 			}
-			str[i++][j] = '\0';
+			str[i][j] = '\0';
+			i++;
 		}
 	}
 	str[i] = NULL;

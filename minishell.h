@@ -22,6 +22,7 @@ typedef struct s_struct
 	t_list1	*s_com;
 	char	**env_array;
 	char	*s_cmd_line;
+	char	*stroka;
 	int	count_pipe;
 	int	status;
 }t_struct;

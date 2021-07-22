@@ -7,7 +7,7 @@ char	*ft_space(char *str)
 	int	len;
 
 	if (!str)
-		return (NULL);
+		return (0);
 	i = 0;
 	len = ft_strlen(str);
 	if (str[i] == 32)
@@ -22,6 +22,6 @@ char	*ft_space(char *str)
 			j--;
 	}
 	if (i == 0 && j + 1 == len)
-		return (str);
+		return (ft_strdup(str));
 	return (ft_substr(str, i, j + 1));
 }

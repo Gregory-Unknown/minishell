@@ -41,19 +41,26 @@ void	ft_exec(t_struct *env, t_list1 *tmp)
 		ft_buildins_one(env, tmp, &flag);
 	if (flag)
 	{
+
 		pid = fork();
-		if (!pid)
+		if (pid == -1)
+		{
+			ft_clean(env);
+			exit(-1);
+		}
+		else if (!pid)
 		{
 			if (tmp->builtins)
+			{
 				ft_buildins(env, tmp);
+				ft_clean(env);
+			}
 			else
 			{
 				ft_check_fd(tmp);
 				if (tmp->temporary && !g_status)
-				{
-					env->env_array = ft_make_array(env);
 					g_status = execve(tmp->dir[tmp->i], tmp->temporary, env->env_array);
-				}
+				ft_clean(env);
 			}
 			exit(1);
 		}
