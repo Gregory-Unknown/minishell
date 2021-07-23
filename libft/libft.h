@@ -6,20 +6,20 @@
 
 typedef struct s_list1
 {
-	char	*command;
-	char	*redcom;
-	char	**redirect_command;
-	char	**dir;
-	char	**temporary;
-	int	i;
-	int	builtins;
-	int	dr;
-	int	sr;
-	int	dl;
-	int	sl;
-	int	pipe;
-	pid_t	pid;
-	int	fd[2];
+	char			*command;
+	char			*redcom;
+	char			**redirect_command;
+	char			**dir;
+	char			**temporary;
+	int				i;
+	int				builtins;
+	int				dr;
+	int				sr;
+	int				dl;
+	int				sl;
+	int				pipe;
+	pid_t			pid;
+	int				fd[2];
 	struct s_list1	*next;
 	struct s_list1	*prev;
 }t_list1;

@@ -11,18 +11,19 @@ char	*ft_check_env_param(char *str, t_struct *env)
 	while (tmp)
 	{
 		s = ft_split(tmp->content, '=');
-		if (s[1] && !ft_strncmp(str, s[0], ft_strlen(s[0])) && ((ft_strlen(str) == ft_strlen(s[0]) || ft_isspace(str[ft_strlen(s[0]) + 1]))))
+		if (s[1] && !ft_strncmp(str, s[0], ft_strlen(s[0]))
+			&& ((ft_strlen(str) == ft_strlen(s[0])
+					|| ft_isspace(str[ft_strlen(s[0]) + 1]))))
 		{
 			free(str);
 			stroka = ft_strdup(s[1]);
 			ft_free(s);
-			return(stroka);
+			return (stroka);
 		}
 		ft_free(s);
 		tmp = tmp->next;
 	}
 	free(str);
-	//ft_free(s);
 	return (0);
 }
 
@@ -50,7 +51,7 @@ char	*ft_dollar_change(char *str, int start, int finish, t_struct *env)
 int	ft_check_finish(char *str, int start)
 {
 	char	c;
-	int	i;
+	int		i;
 
 	c = str[start];
 	i = start;
@@ -59,7 +60,8 @@ int	ft_check_finish(char *str, int start)
 		if (c == '$')
 		{
 			start++;
-			while (str[start] && ft_isspace(str[start]) == 0 && str[start] != '$')
+			while (str[start] && ft_isspace(str[start]) == 0
+				&& str[start] != '$')
 				start++;
 			return (start);
 		}
@@ -83,43 +85,6 @@ char	*ft_status_dollar(char *str, int i, t_struct *env)
 	return (s);
 }
 
-char	*ft_check_dollar2(char *s, t_struct *env)
-{
-	int	i;
-	int	flag;
-	int	start;
-	int	finish;
-	char	*str;
-
-	i = 0;
-	flag = 0;
-	finish = 0;
-	str = ft_strdup(s);
-	free(s);
-	while (str[i])
-	{
-		if (!flag && str[i] == '\'')
-			flag = 1;
-		else if (flag && str[i] == '\'')
-			flag = 0;
-		else if (!flag && str[i] == '$' && !ft_isspace(str[i + 1]))
-		{
-			if (str[i + 1] == '?')
-				str = ft_status_dollar(str, i, env);
-			else
-			{
-				start = i;
-				finish = ft_check_finish(str, start);
-				str = ft_dollar_change(str, start, finish, env);
-			}
-			flag = 0;
-			i = -1;
-		}
-		i++;
-	}
-	return (str);
-}
-
 void	ft_check_dollar(t_list1 *tmp, t_struct *env)
 {
 	int	i;
@@ -127,8 +92,8 @@ void	ft_check_dollar(t_list1 *tmp, t_struct *env)
 	i = 0;
 	while (tmp->temporary[i])
 	{
-		tmp->temporary[i] = ft_check_dollar2(tmp->temporary[i], env);
+		if (ft_strchr(tmp->temporary[i], '$'))
+			tmp->temporary[i] = ft_check_dollar2(tmp->temporary[i], env);
 		i++;
 	}
 }
-

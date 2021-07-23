@@ -3,7 +3,7 @@
 static const char	*ft_is_pass(const char *str)
 {
 	while (*str == '\t' || *str == '\n' || *str == '\v'
-			|| *str == '\f' || *str == '\r' || *str == 32)
+		|| *str == '\f' || *str == '\r' || *str == 32)
 		str++;
 	return (str);
 }

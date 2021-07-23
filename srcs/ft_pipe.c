@@ -1,41 +1,8 @@
 #include "../minishell.h"
 
-// void	ft_pipe(t_struct *env, t_list1 *tmp)
-// {
-// 	//int fd[2];
-// 	//char *str;
-
-// 	// str = ft_strdup(tmp->next->command);
-// 	// if (!ft_checker_left_red(str))
-// 	// {
-// 	// 	free(str);
-// 	// 	return ;
-// 	// }
-// 	// else
-// 	// 	free(str);
-// 	pipe(tmp->fd);
-// 	tmp->pid = fork();
-// 	if (tmp->pid == -1)
-// 		exit(-1);
-// 	else if (tmp->pid == 0)
-// 	{
-// 		dup2(tmp->fd[1], 1);
-// 		close(tmp->fd[0]);
-// 		ft_exec(env, tmp);
-// 		close(tmp->fd[1]);
-// 		exit(1);
-// 	}
-// 	else
-// 	{
-// 		dup2(tmp->fd[0], 0);
-// 		close(tmp->fd[0]);
-// 		close(tmp->fd[1]);
-// 	}
-// }
-
 void	ft_pipe(t_struct *env, t_list1 *tmp)
 {
-	int fd[2];
+	int		fd[2];
 	pid_t	pid;
 
 	pipe(fd);
@@ -63,13 +30,12 @@ void	ft_pipe(t_struct *env, t_list1 *tmp)
 
 void	ft_pipe_start(t_struct *env)
 {
-	t_list1 *tmp;
-	int	fd0;
+	t_list1	*tmp;
+	int		fd0;
 
 	env->env_array = ft_make_array(env);
 	tmp = env->s_com;
 	fd0 = dup(0);
-
 	while (tmp->pipe && !g_status)
 	{
 		ft_pipe(env, tmp);

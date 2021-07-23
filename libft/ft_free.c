@@ -2,7 +2,7 @@
 
 void	*ft_free(char **str)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (str)

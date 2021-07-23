@@ -6,6 +6,6 @@ char	**ft_malloc_array(int len)
 
 	str = (char **)malloc(sizeof(char *) * len);
 	if (!str)
-		exit(-1);
+		return (NULL);
 	return (str);
 }

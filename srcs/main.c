@@ -1,114 +1,60 @@
 #include "../minishell.h"
 
-void	ft_signal_handler(int signal)
+void	ft_init(t_struct *env)
 {
-	if (signal == SIGINT)
-	{
-		if (waitpid(-1, NULL, WNOHANG) == -1)
-		{
-			rl_on_new_line();
-			rl_redisplay();
-			printf("  \n");
-			rl_on_new_line();
-			rl_replace_line("", 0);
-			rl_redisplay();
-		}
-		else
-			printf("\n");
-	}
-}
-
-void	ft_signal_quit_handler(int signal)
-{
-	if (signal == SIGQUIT)
-	{
-		if (waitpid(-1, NULL, WNOHANG) == -1)
-		{
-			rl_on_new_line();
-			rl_redisplay();
-			printf("  \b\b");
-		}
-		else
-			printf("Quit: 3\n");
-	}
-}
-
-
-// int	ft_check_double_quotes(char *str, int i)
-// {
-// 	if (str[i] == '"' && str[i + 1] == '"')
-// 		return (1);
-// 	if (str[i] == '\'' && str[i + 1] == '\'')
-// 		return (1);
-// 	return (0);
-// }
-
-// void	ft_quotes(t_struct *env)
-// {
-// 	int i;
-// 	int j;
-// 	char *str;
-
-// 	i = 0;
-// 	j = 0;
-// 	str = ft_strdup(env->s_cmd_line);
-// 	ft_bzero(env->s_cmd_line, ft_strlen(env->s_cmd_line));
-// 	while (i < ft_strlen(str))
-// 	{
-// 		if (ft_check_double_quotes(str, i))
-// 			i += 2;
-// 		else
-// 		{
-// 			env->s_cmd_line[j] = str[i];
-// 			j++;
-// 			i++;
-// 		}
-// 	}
-// 	env->s_cmd_line[j] = '\0';
-// 	free(str);
-// }
-
-int	main(int argc, char **argv, char **envv)
-{
-	t_struct	*env;
-
-	(void)argc;
-	(void)argv;
-	env = (t_struct *)malloc(sizeof(t_struct));
-	signal(SIGINT, ft_signal_handler);
-	signal(SIGQUIT, ft_signal_quit_handler);
-	env->s_env = ft_init_env(envv);
 	env->s_exp = 0;
 	env->s_com = 0;
 	env->env_array = 0;
 	env->stroka = 0;
 	env->s_cmd_line = 0;
+	signal(SIGINT, ft_signal_handler);
+	signal(SIGQUIT, ft_signal_quit_handler);
 	g_status = 0;
-	while (1)
+}
+
+void	ft_start_line(t_struct *env)
+{
+	env->stroka = env->s_cmd_line;
+	env->s_cmd_line = ft_space(env->s_cmd_line);
+	free(env->stroka);
+	ft_lexer(env);
+	ft_parser(env);
+}
+
+void	ft_start(t_struct *env)
+{
+	env->status = g_status;
+	g_status = 0;
+	env->count_pipe = 0;
+	env->s_cmd_line = readline("minishell $>> ");
+	if (env->s_cmd_line == NULL)
 	{
-		if (g_status != 0)
-			printf("FUCK OFF ERROR !\n");
-		env->status = g_status;
-		g_status = 0;
-		env->count_pipe = 0;
-		env->s_cmd_line = readline("minishell $>> ");
-		if (env->s_cmd_line == NULL)
-		{
-			printf("\033[Aminishell >> $ exit\n");
-			exit(0);
-		}
-		add_history(env->s_cmd_line);
-		if (ft_strlen(env->s_cmd_line) > 0)
-		{
-			env->stroka = env->s_cmd_line;
-			env->s_cmd_line = ft_space(env->s_cmd_line);
-			free(env->stroka);
-			ft_lexer(env);
-			if (!g_status)
-				ft_parser(env);
-		}
-		free(env->s_cmd_line);
-		sleep(3);
+		printf("\033[Aminishell $>>  exit\n");
+		exit(0);
 	}
+	add_history(env->s_cmd_line);
+	if (ft_strlen(env->s_cmd_line) > 0)
+		ft_start_line(env);
+	free(env->s_cmd_line);
+}
+
+int	main(int argc, char **argv, char **envv)
+{
+	t_struct	*env;
+
+	env = (t_struct *)malloc(sizeof(t_struct));
+	if (!env)
+		return (1);
+	env->s_env = ft_init_env(envv);
+	ft_shell_lvl(env);
+	if (argc != 1)
+	{
+		printf("minishell: %s: No such file or directory\n", argv[1]);
+		return (1);
+	}
+	ft_init(env);
+	while (1)
+		ft_start(env);
+	sleep(3);
 	return (0);
 }

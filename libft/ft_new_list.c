@@ -6,7 +6,7 @@ t_list1	*ft_new_list(char *command, int pipe)
 
 	list = (t_list1 *)malloc(sizeof(t_list1));
 	if (!list)
-		exit(-1);
+		return (NULL);
 	list->command = command;
 	list->redcom = 0;
 	list->redirect_command = 0;

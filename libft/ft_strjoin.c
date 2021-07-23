@@ -2,13 +2,13 @@
 
 char	*ft_strjoin(char *s1, char *s2)
 {
-	int	i;
-	int	j;
+	int		i;
+	int		j;
 	char	*str;
 
 	str = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
 	if (!str)
-		exit(-1);
+		return (NULL);
 	i = 0;
 	while (s1[i])
 	{

@@ -42,8 +42,8 @@ void	ft_del_elem(t_struct *env, int len, char *str)
 void	ft_unset(t_struct *env, t_list1 *fd)
 {
 	char	**tmp;
-	int	len;
-	int	i;
+	int		len;
+	int		i;
 
 	i = 1;
 	len = 0;

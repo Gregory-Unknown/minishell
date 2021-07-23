@@ -1,23 +1,93 @@
 #include "../minishell.h"
 
-char	**ft_make_array(t_struct *env)
+static void	ft_redirect_split_out2(t_list1 *tmp, int i, char **str, int num)
 {
-	char	**array;
-	t_list	*tmp;
-	int	i;
+	char	*stroka;
+	char	*temp;
+	int		j;
 
-	tmp = env->s_env;
-	i = ft_lstsize(tmp) + 1;
-	array = (char **)malloc(sizeof(char *) * i);
-	if (!array)
-		return (NULL);
+	j = 0;
+	if (num == 1)
+		j = ft_check_end(tmp->redcom, i);
+	else if (num == 2)
+		j = ft_check_end(tmp->redcom, i + 1);
+	stroka = ft_substr(tmp->redcom, i, j);
+	temp = ft_strjoin("/", stroka);
+	*str = ft_strjoin1(*str, temp);
+	free(temp);
+	free(stroka);
+}
+
+void	ft_redirect_split_out(t_list1 *tmp)
+{
+	int		i;
+	int		num;
+	char	*str;
+
 	i = 0;
-	while (tmp)
+	str = ft_strdup("");
+	while (tmp->redcom[i])
 	{
-		array[i] = ft_strdup(tmp->content);
+		num = ft_is_redirect(&(tmp->redcom)[i]);
+		if (num)
+			ft_redirect_split_out2(tmp, i, &str, num);
 		i++;
-		tmp = tmp->next;
 	}
-	array[i] = NULL;
-	return (array);
+	tmp->redirect_command = ft_split(str, '/');
+	free(str);
+}
+
+void	ft_get_path_param(t_list1 *tmp)
+{
+	tmp->dir = ft_malloc_array(2);
+	tmp->i = 0;
+	tmp->dir[tmp->i] = ft_strdup(tmp->temporary[0]);
+	tmp->i = 1;
+	tmp->dir[tmp->i] = 0;
+	tmp->i = 0;
+}
+
+void	ft_check_valid_path(t_list1 *tmp)
+{
+	struct stat	buf[4096];
+
+	if (!stat(tmp->temporary[0], buf))
+	{
+		tmp->dir = ft_malloc_array(2);
+		tmp->dir[0] = ft_strdup(tmp->temporary[0]);
+		tmp->dir[1] = 0;
+	}
+	else
+	{
+		g_status = 127;
+		printf("minishell: %s: command not found\n", tmp->temporary[0]);
+	}
+}
+
+void	ft_find_path(t_list1 *tmp, char **path_arr)
+{
+	char		*s;
+	struct stat	buf[4096];
+
+	while (path_arr[tmp->i] && !g_status)
+	{
+		s = ft_strjoin(path_arr[tmp->i], "/");
+		s = ft_strjoin1(s, tmp->temporary[0]);
+		tmp->dir[tmp->i] = ft_strdup(s);
+		free(s);
+		if (!stat(tmp->dir[tmp->i], buf))
+		{
+			tmp->dir[tmp->i + 1] = NULL;
+			break ;
+		}
+		tmp->i++;
+	}
+	if (tmp->i >= ft_arraylen(path_arr) - 1)
+	{
+		g_status = 127;
+		printf("minishell: %s: command not found\n", tmp->temporary[0]);
+		tmp->dir[tmp->i] = NULL;
+	}
+	if (!g_status && tmp->dir[tmp->i + 1] != NULL)
+		tmp->dir[tmp->i] = NULL;
 }

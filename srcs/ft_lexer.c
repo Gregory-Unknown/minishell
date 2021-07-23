@@ -1,8 +1,8 @@
 #include "../minishell.h"
 
-int	ft_check_pipe(char * str, char c)
+int	ft_check_pipe(char *str, char c)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (str[i] == c)
@@ -36,7 +36,7 @@ int	ft_check_quotes(char *str, char c)
 	return (0);
 }
 
-int	ft_check_redirect(char * str, char c)
+int	ft_check_redirect(char *str, char c)
 {
 	int	i;
 	int	flag;
@@ -50,7 +50,7 @@ int	ft_check_redirect(char * str, char c)
 		else if (flag && str[i] != '|')
 			flag = 0;
 		else
-			flag = (flag) ? 1 : 0;
+			flag = ft_flag(flag);
 		i++;
 	}
 	if (flag)
@@ -74,25 +74,25 @@ int	ft_check_symbol(char *str, char c)
 
 int	ft_lexer(t_struct *env)
 {
-	char *str;
-
-	str = env->s_cmd_line;
 	if (ft_check_pipe(env->s_cmd_line, '|'))
 	{
 		g_status = 258;
 		return (1);
 	}
-	if (ft_check_quotes(env->s_cmd_line, '\'') || ft_check_quotes(env->s_cmd_line, '\"'))
+	if (ft_check_quotes(env->s_cmd_line, '\'')
+		|| ft_check_quotes(env->s_cmd_line, '\"'))
 	{
 		g_status = 127;
 		return (1);
 	}
-	if (ft_check_redirect(env->s_cmd_line, '>') || ft_check_redirect(env->s_cmd_line, '<'))
+	if (ft_check_redirect(env->s_cmd_line, '>')
+		|| ft_check_redirect(env->s_cmd_line, '<'))
 	{
 		g_status = 258;
 		return (1);
 	}
-	if (ft_check_symbol(env->s_cmd_line, '\\') || ft_check_symbol(env->s_cmd_line, ';'))
+	if (ft_check_symbol(env->s_cmd_line, '\\')
+		|| ft_check_symbol(env->s_cmd_line, ';'))
 	{
 		g_status = 258;
 		return (1);
