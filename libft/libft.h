@@ -31,6 +31,13 @@ typedef struct s_list
 	struct s_list	*next;
 }t_list;
 
+typedef struct s_split
+{
+	char	**str;
+	int		i;
+	int		j;
+}t_split;
+
 t_list1	*ft_new_list(char *command, int is_pipe);
 void	ft_push_back(t_list1 **lst, t_list1 *new);
 void	ft_lstadd_back(t_list **lst, t_list *new);

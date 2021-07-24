@@ -1,5 +1,19 @@
 #include "../minishell.h"
 
+int	ft_check_line(char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i])
+	{
+		if (!ft_isspace(str[i]))
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
 void	ft_init(t_struct *env)
 {
 	env->s_exp = 0;
@@ -33,7 +47,7 @@ void	ft_start(t_struct *env)
 		exit(0);
 	}
 	add_history(env->s_cmd_line);
-	if (ft_strlen(env->s_cmd_line) > 0)
+	if (ft_strlen(env->s_cmd_line) > 0 && ft_check_line(env->s_cmd_line))
 		ft_start_line(env);
 	free(env->s_cmd_line);
 }

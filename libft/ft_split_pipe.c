@@ -1,5 +1,19 @@
 #include "libft.h"
 
+static void	ft_word_count_norm(char **s, int *quote_flag, char *c, int *flag)
+{
+	if (*(*s) == 34 && !(*quote_flag))
+		*quote_flag = 1;
+	else if (*(*s) == 34 && *quote_flag)
+		*quote_flag = 0;
+	if (*(*s) == 39 && !(*quote_flag))
+		*quote_flag = 1;
+	else if (*(*s) == 39 && *quote_flag)
+		*quote_flag = 0;
+	if (*(*s) == *c && !(*quote_flag) && *flag == 1)
+		*flag = 0;
+}
+
 static int	ft_word_count(char *s, char c)
 {
 	int	count;
@@ -16,16 +30,7 @@ static int	ft_word_count(char *s, char c)
 			flag = 1;
 			count++;
 		}
-		if (*s == 34 && !quote_flag)
-			quote_flag = 1;
-		else if (*s == 34 && quote_flag)
-			quote_flag = 0;
-		if (*s == 39 && !quote_flag)
-			quote_flag = 1;
-		else if (*s == 39 && quote_flag)
-			quote_flag = 0;
-		if (*s == c && !quote_flag && flag == 1)
-			flag = 0;
+		ft_word_count_norm(&s, &quote_flag, &c, &flag);
 		s++;
 	}
 	return (count);
@@ -54,55 +59,48 @@ static int	ft_len(char *s, char c)
 	return (len);
 }
 
-static void		*ft_free_split(char **str, int i)
+static void	ft_split_pipe_norm(char **str, char **s, int *i, int *j)
 {
-	while (i--)
-		free(str[i]);
-	free(str);
-	return (NULL);
+	if (*(*s) == '\"')
+	{
+		str[*i][(*j)++] = *(*s)++;
+		while (*(*s) != '\"' && *(*s))
+			str[*i][(*j)++] = *(*s)++;
+		if (*(*s) == '\"')
+			str[*i][(*j)++] = *(*s)++;
+	}
+	else if (*(*s) == '\'')
+	{
+		str[*i][(*j)++] = *(*s)++;
+		while (*(*s) != '\'' && *(*s))
+			str[*i][(*j)++] = *(*s)++;
+		if (*(*s) == '\'')
+			str[*i][(*j)++] = *(*s)++;
+	}
+	else
+		str[*i][(*j)++] = *(*s)++;
 }
 
-char			**ft_split_pipe(char *s, char c)
+char	**ft_split_pipe(char *s, char c)
 {
 	char	**str;
-	int	i;
-	int	j;
+	int		i;
+	int		j;
 
 	if (!s)
 		return (NULL);
 	i = 0;
-	if (!(str = (char **)malloc(sizeof(char*) * (ft_word_count(s, c) + 1))))
-		return (NULL);
+	str = (char **)malloc(sizeof(char *) * (ft_word_count(s, c) + 1));
 	while (*s)
 	{
 		if (*s == c)
 			s++;
 		else
 		{
-			if (!(str[i] = (char *)malloc(sizeof(char) * (ft_len(s, c) + 1))))
-				return (ft_free_split(str, i));
+			str[i] = (char *)malloc(sizeof(char) * (ft_len(s, c) + 1));
 			j = 0;
 			while (*s && *s != c)
-			{
-				if (*s == '\"')
-				{
-					str[i][j++] = *s++;
-					while (*s != '\"' && *s)
-						str[i][j++] = *s++;
-					if (*s == '\"')
-						str[i][j++] = *s++;
-				}
-				else if (*s == '\'')
-				{
-					str[i][j++] = *s++;
-					while (*s != '\'' && *s)
-						str[i][j++] = *s++;
-					if (*s == '\'')
-						str[i][j++] = *s++;
-				}
-				else
-					str[i][j++] = *s++;
-			}
+				ft_split_pipe_norm(str, &s, &i, &j);
 			str[i][j] = '\0';
 			i++;
 		}

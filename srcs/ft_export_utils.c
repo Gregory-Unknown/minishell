@@ -27,10 +27,14 @@ static char	*ft_str_export(char	*str)
 	while (str[j])
 	{
 		if (j > 0 && str[j - 1] == '=')
+		{
 			s[i++] = '\"';
+			len = 1;
+		}
 		s[i++] = str[j++];
 	}
-	s[i++] = '\"';
+	if (len)
+		s[i++] = '\"';
 	s[i] = '\0';
 	free(str);
 	return (s);

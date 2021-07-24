@@ -5,7 +5,7 @@ SRC			= main.c ft_export.c ft_env.c ft_unset.c ft_parser.c \
 			ft_redirect.c ft_redirect_utils.c ft_parser_utils.c ft_lexer.c \
 			ft_buildins.c ft_shlvl.c ft_dollar.c ft_signals.c ft_parser_utils2.c \
 			ft_parser_utils3.c ft_export_utils.c ft_export_utils2.c ft_dollar_utils.c \
-			ft_parser_utils4.c export_utils3.c
+			ft_parser_utils4.c ft_export_utils3.c
 
 SRCS		= $(addprefix srcs/, $(SRC))
 

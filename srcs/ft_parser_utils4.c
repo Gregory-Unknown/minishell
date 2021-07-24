@@ -3,18 +3,24 @@
 static char	*ft_split_command(char *str, char c)
 {
 	char	**s;
+	char	*stroka;
 	int		i;
 
 	i = 0;
 	s = ft_split(str, c);
 	free(str);
-	str = ft_space(ft_strdup(s[0]));
+	stroka = ft_strdup(s[0]);
+	str = ft_space(stroka);
+	free(stroka);
 	i = 1;
 	while (s[i])
 	{
-		str = ft_strjoin1(str, ft_space(s[i]));
+		stroka = ft_space(s[i]);
+		str = ft_strjoin1(str, stroka);
+		free(stroka);
 		i++;
 	}
+	ft_free(s);
 	return (str);
 }
 

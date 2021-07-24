@@ -16,7 +16,7 @@ int	ft_search_elem(t_struct *env, char *str)
 	if (!s[1])
 	{
 		ft_free(s);
-		return (1);
+		return (0);
 	}
 	while (tmp)
 	{

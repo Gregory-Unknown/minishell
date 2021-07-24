@@ -2,8 +2,8 @@
 
 static int	ft_word_count(char *s, char c)
 {
-	int count;
-	int flag;
+	int	count;
+	int	flag;
 
 	count = 0;
 	flag = 0;
@@ -23,7 +23,7 @@ static int	ft_word_count(char *s, char c)
 
 static int	ft_len(char *s, char c)
 {
-	int len;
+	int	len;
 
 	len = 0;
 	while (*s && *s != c)
@@ -34,33 +34,23 @@ static int	ft_len(char *s, char c)
 	return (len);
 }
 
-static void		*ft_free_split(char **str, int i)
-{
-	while (i--)
-		free(str[i]);
-	free(str);
-	return (NULL);
-}
-
-char			**ft_split(char *s, char c)
+char	**ft_split(char *s, char c)
 {
 	char	**str;
-	int	i;
-	int	j;
+	int		i;
+	int		j;
 
 	if (!s)
 		return (NULL);
 	i = 0;
-	if (!(str = (char **)malloc(sizeof(char*) * (ft_word_count(s, c) + 1))))
-		return (NULL);
+	str = (char **)malloc(sizeof(char *) * (ft_word_count(s, c) + 1));
 	while (*s)
 	{
 		if (*s == c)
 			s++;
 		else
 		{
-			if (!(str[i] = (char *)malloc(sizeof(char) * (ft_len(s, c) + 1))))
-				return (ft_free_split(str, i));
+			str[i] = (char *)malloc(sizeof(char) * (ft_len(s, c) + 1));
 			j = 0;
 			while (*s && *s != c)
 				str[i][j++] = *s++;
