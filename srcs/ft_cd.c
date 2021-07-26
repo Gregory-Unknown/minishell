@@ -90,10 +90,12 @@ int	ft_cd(t_struct *env, t_list1 *fd)
 	}
 	str = getcwd(0, 0);
 	res = ft_cd_utils(env, fd, str);
-	res = ft_chdirerror(env, fd, str);
+	if (!res)
+		res = ft_chdirerror(env, fd, str);
 	if (res)
 		return (res);
-	free(str);
+	if (str)
+		free(str);
 	ft_update_pwd(env);
 	return (1);
 }

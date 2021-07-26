@@ -29,8 +29,34 @@ static void	ft_check_fd(t_list1 *tmp)
 	}
 }
 
-static void	ft_fork_execve(t_struct *env, t_list1 *tmp, pid_t pid)
+static void	ft_exec_status(t_struct *env, t_list1 *tmp)
 {
+	if (tmp->builtins)
+	{
+		ft_buildins(env, tmp);
+		ft_clean(env);
+	}
+	else
+	{
+		ft_check_fd(tmp);
+		if (tmp->temporary && tmp->dir && !g_status)
+			execve(tmp->dir[tmp->i],
+				tmp->temporary, env->env_array);
+		else
+		{
+			printf("minishell: %s: No such file or directory\n",
+				tmp->temporary[0]);
+			g_status = 127;
+		}
+		ft_clean(env);
+	}
+	exit(g_status);
+}
+
+static void	ft_fork_execve(t_struct *env, t_list1 *tmp)
+{
+	pid_t	pid;
+
 	pid = fork();
 	if (pid == -1)
 	{
@@ -38,35 +64,23 @@ static void	ft_fork_execve(t_struct *env, t_list1 *tmp, pid_t pid)
 		exit(-1);
 	}
 	else if (!pid)
-	{
-		if (tmp->builtins)
-		{
-			ft_buildins(env, tmp);
-			ft_clean(env);
-		}
-		else
-		{
-			ft_check_fd(tmp);
-			if (tmp->temporary && !g_status)
-				g_status = execve(tmp->dir[tmp->i],
-						tmp->temporary, env->env_array);
-			ft_clean(env);
-		}
-		exit(1);
-	}
+		ft_exec_status(env, tmp);
 	else
-		waitpid(pid, NULL, 0);
+	{
+		waitpid(pid, &g_status, 0);
+		g_status = WEXITSTATUS(g_status);
+		if (WIFEXITED(g_status))
+			env->flag_status = 1;
+	}
 }
 
 void	ft_exec(t_struct *env, t_list1 *tmp)
 {
-	int		flag;
-	pid_t	pid;
+	int	flag;
 
-	pid = 0;
 	flag = 1;
 	if (!env->count_pipe && tmp->builtins)
 		ft_buildins_one(env, tmp, &flag);
 	if (flag)
-		ft_fork_execve(env, tmp, pid);
+		ft_fork_execve(env, tmp);
 }

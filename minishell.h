@@ -26,6 +26,7 @@ typedef struct s_struct
 	char	*stroka;
 	int		count_pipe;
 	int		status;
+	int		flag_status;
 }t_struct;
 
 typedef struct s_shlvl
@@ -86,5 +87,14 @@ char	*ft_status_dollar(char *str, int i, t_struct *env);
 int		ft_check_finish(char *str, int start);
 char	*ft_dollar_change(char *str, int start, int finish, t_struct *env);
 int		ft_search_elem(t_struct *env, char *str);
+int		ft_status(t_struct *env);
+int		ft_check_stupid(char *str);
+int		ft_check_line(char *str);
+char	*ft_getenv(t_struct *env);
+int		ft_check_stupid_input(t_list1 *tmp);
+int		ft_check_space(char *str, char c);
+int		ft_checker_space(char *str);
+void	ft_norm_check_pipe(int i, int *flag, char *str, char c);
+int		ft_check_norm_red(int i, int *flag, char *str, char c);
 
 #endif

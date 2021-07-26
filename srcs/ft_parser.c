@@ -1,16 +1,22 @@
 #include "../minishell.h"
 
-void	ft_get_path_command(t_list1	*tmp)
+void	ft_get_path_command(t_list1	*tmp, t_struct *env)
 {
 	char	**path_arr;
+	char	*str;
 
-	path_arr = ft_split(getenv("PATH"), ':');
+	str = ft_getenv(env);
+	path_arr = ft_split(str, ':');
+	free(str);
 	if (!path_arr)
-		exit(-1);
-	tmp->dir = ft_malloc_array(ft_arraylen(path_arr) + 2);
-	tmp->i = 0;
-	ft_find_path(tmp, path_arr);
-	ft_free(path_arr);
+		tmp->dir = 0;
+	else
+	{
+		tmp->dir = ft_malloc_array(ft_arraylen(path_arr) + 2);
+		tmp->i = 0;
+		ft_find_path(tmp, path_arr);
+		ft_free(path_arr);
+	}
 }
 
 void	ft_command_check_out(t_list1 *tmp, t_struct *env)
@@ -26,7 +32,7 @@ void	ft_command_check_out(t_list1 *tmp, t_struct *env)
 	else if (ft_check_buildins(tmp->temporary[0]))
 		tmp->builtins = 1;
 	else
-		ft_get_path_command(tmp);
+		ft_get_path_command(tmp, env);
 }
 
 void	ft_make_list_redirect(t_struct *env)
@@ -36,14 +42,14 @@ void	ft_make_list_redirect(t_struct *env)
 
 	i = 0;
 	tmp = env->s_com;
-	while (tmp)
+	while (tmp && !g_status)
 	{
 		ft_redirect_check_out(tmp);
 		if (tmp->redcom)
 			ft_redirect_split_out(tmp);
 		if (tmp->command && !g_status)
 			ft_command_check_out(tmp, env);
-		if (tmp->redcom)
+		if (tmp->redcom && !g_status)
 			ft_process_redirect(tmp);
 		tmp = tmp->next;
 	}
@@ -57,7 +63,14 @@ void	ft_init_param(t_struct *env)
 
 void	ft_parser(t_struct *env)
 {
+	t_list	*tmp;
+
+	tmp = env->s_env;
 	ft_init_param(env);
-	ft_pipe_start(env);
+	if (!g_status)
+	{
+		env->env_array = ft_make_array(env);
+		ft_pipe_start(env);
+	}
 	ft_clean(env);
 }

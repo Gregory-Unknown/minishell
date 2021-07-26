@@ -5,7 +5,8 @@ SRC			= main.c ft_export.c ft_env.c ft_unset.c ft_parser.c \
 			ft_redirect.c ft_redirect_utils.c ft_parser_utils.c ft_lexer.c \
 			ft_buildins.c ft_shlvl.c ft_dollar.c ft_signals.c ft_parser_utils2.c \
 			ft_parser_utils3.c ft_export_utils.c ft_export_utils2.c ft_dollar_utils.c \
-			ft_parser_utils4.c ft_export_utils3.c
+			ft_parser_utils4.c ft_export_utils3.c ft_status.c ft_parser_utils5.c \
+			ft_lexer_utils.c
 
 SRCS		= $(addprefix srcs/, $(SRC))
 
@@ -13,21 +14,23 @@ OBJS		= $(SRCS:.c=.o)
 
 CC			= gcc
 
-INC			= -I ./ -I ./libft
+INC			= -I. -Ilibft
 
-FLAGS		= -Wall -Wextra -Werror  -g
+FLAGS		= -Wall -Wextra -Werror  -g $(INC)
 
 READLFLAG	= -L/Users/esobchak/.brew/Cellar/readline/8.1/lib/ \
 			-I/Users/esobchak/.brew/Cellar/readline/8.1/include \
 			-lreadline
 LIBFT		= -L libft -lft
 
-all:$(NAME)
 
-$(NAME):
+$(NAME):$(OBJS) minishell.h ./libft/libft.h
 	@make -C ./libft
 	@$(CC) ${FLAGS} ${READLFLAG} ${SRCS} ${LIBFT} -o ${NAME}
 	@echo "\033[0;33m\t>>>>>Compile minishell done!<<<<"
+
+all:$(NAME)
+
 
 clean:
 	@/bin/rm -f $(OBJ)

@@ -33,7 +33,6 @@ void	ft_pipe_start(t_struct *env)
 	t_list1	*tmp;
 	int		fd0;
 
-	env->env_array = ft_make_array(env);
 	tmp = env->s_com;
 	fd0 = dup(0);
 	while (tmp->pipe && !g_status)

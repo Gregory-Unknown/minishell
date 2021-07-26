@@ -13,16 +13,12 @@ int	ft_search_elem(t_struct *env, char *str)
 
 	tmp = env->s_env;
 	s = ft_split(str, '=');
-	if (!s[1])
-	{
-		ft_free(s);
-		return (0);
-	}
 	while (tmp)
 	{
 		if (!ft_strncmp(s[0], tmp->content, ft_strlen(s[0])))
 		{
-			tmp->content = ft_change_value(str, tmp);
+			if (s[1])
+				tmp->content = ft_change_value(str, tmp);
 			ft_free(s);
 			return (1);
 		}

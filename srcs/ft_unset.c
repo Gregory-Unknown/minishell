@@ -23,7 +23,7 @@ void	ft_del_elem(t_struct *env, int len, char *str)
 			len = ft_strlen(str);
 		else
 			len = ft_content_name_len(curr->content);
-		if (ft_strncmp(str, curr->content, len) == 0)
+		if (!ft_strncmp(str, curr->content, len))
 		{
 			if (prev)
 				prev->next = curr->next;

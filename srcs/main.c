@@ -4,6 +4,8 @@ int	ft_check_line(char *str)
 {
 	int	i;
 
+	if (!str)
+		return (0);
 	i = 0;
 	while (str[i])
 	{
@@ -21,6 +23,8 @@ void	ft_init(t_struct *env)
 	env->env_array = 0;
 	env->stroka = 0;
 	env->s_cmd_line = 0;
+	env->flag_status = 0;
+	env->status = 0;
 	signal(SIGINT, ft_signal_handler);
 	signal(SIGQUIT, ft_signal_quit_handler);
 	g_status = 0;
@@ -31,15 +35,17 @@ void	ft_start_line(t_struct *env)
 	env->stroka = env->s_cmd_line;
 	env->s_cmd_line = ft_space(env->s_cmd_line);
 	free(env->stroka);
-	ft_lexer(env);
-	ft_parser(env);
+	g_status = ft_lexer(env);
+	if (!g_status)
+		ft_parser(env);
 }
 
 void	ft_start(t_struct *env)
 {
-	env->status = g_status;
+	env->status = ft_status(env);
 	g_status = 0;
 	env->count_pipe = 0;
+	env->flag_status = 0;
 	env->s_cmd_line = readline("minishell $>> ");
 	if (env->s_cmd_line == NULL)
 	{
@@ -69,6 +75,5 @@ int	main(int argc, char **argv, char **envv)
 	ft_init(env);
 	while (1)
 		ft_start(env);
-	sleep(3);
-	return (0);
+	return (ft_status(env));
 }

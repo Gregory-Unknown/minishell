@@ -6,8 +6,14 @@ static char	*ft_split_command(char *str, char c)
 	char	*stroka;
 	int		i;
 
-	i = 0;
 	s = ft_split(str, c);
+	if (!ft_check_line(s[0]))
+	{
+		free(str);
+		str = ft_strdup(s[0]);
+		free(str);
+		return (s[0]);
+	}
 	free(str);
 	stroka = ft_strdup(s[0]);
 	str = ft_space(stroka);
@@ -15,10 +21,9 @@ static char	*ft_split_command(char *str, char c)
 	i = 1;
 	while (s[i])
 	{
-		stroka = ft_space(s[i]);
+		stroka = ft_space(s[i++]);
 		str = ft_strjoin1(str, stroka);
 		free(stroka);
-		i++;
 	}
 	ft_free(s);
 	return (str);

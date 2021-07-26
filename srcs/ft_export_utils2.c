@@ -55,11 +55,19 @@ void	ft_add_env(t_struct *env, t_list1 *fd)
 	i = 1;
 	while (fd->temporary[i])
 	{
-		tmp = ft_split(fd->temporary[i], '=');
-		len = ft_arraylen(tmp);
-		if (!ft_check_name(tmp[0]) && len < 3)
-			ft_add_elem(env, len, fd->temporary[i]);
-		ft_free(tmp);
+		if (!ft_strcmp(fd->temporary[i], "="))
+			printf("minishell: export: `=': not a valid identifier\n");
+		else
+		{
+			tmp = ft_split(fd->temporary[i], '=');
+			len = ft_arraylen(tmp);
+			if (!ft_check_name(tmp[0]) && len < 3)
+				ft_add_elem(env, len, fd->temporary[i]);
+			else
+				printf("minishell: export: `%s':not a valid identifier\n",
+					fd->temporary[i]);
+			ft_free(tmp);
+		}
 		i++;
 	}
 }

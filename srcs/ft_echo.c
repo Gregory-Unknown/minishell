@@ -18,7 +18,8 @@ int	ft_echo(t_list1 *fd)
 		write(fd->fd[1], "minishell: ", 11);
 		write(fd->fd[1], fd->temporary[0], ft_strlen(fd->temporary[0]));
 		write(fd->fd[1], ": command not found\n", 20);
-		return (1);
+		g_status = 127;
+		return (g_status);
 	}
 	if (!fd->temporary[1])
 		write(fd->fd[1], "\n", 1);
