@@ -38,6 +38,7 @@ void	ft_start_line(t_struct *env)
 	g_status = ft_lexer(env);
 	if (!g_status)
 		ft_parser(env);
+	ft_clean(env);
 }
 
 void	ft_start(t_struct *env)

@@ -60,6 +60,8 @@ static void	ft_heredoc(char *str)
 		free(line);
 		line = readline("> ");
 	}
+	if (g_status == 130)
+		g_status = 1;
 	free(line);
 	close(fds);
 }

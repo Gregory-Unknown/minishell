@@ -33,7 +33,7 @@ all:$(NAME)
 
 
 clean:
-	@/bin/rm -f $(OBJ)
+	@/bin/rm -f $(OBJS)
 	@make clean -C ./libft
 	@echo "\033[0;33m>>>Clean .o files done!<<<"
 
